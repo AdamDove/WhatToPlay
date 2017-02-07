@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,6 +24,20 @@ namespace WhatToPlay
         public MainWindow()
         {
             InitializeComponent();
+        }
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            base.OnClosing(e);
+            if (MessageBox.Show("Are you sure you want to Exit?", "Exit", MessageBoxButton.YesNo, MessageBoxImage.Question) ==  MessageBoxResult.Yes)
+                e.Cancel = false;
+            else
+                e.Cancel = true;
+        }
+        protected override void OnClosed(EventArgs e)
+        {
+            (DataContext as WhatToPlay.ViewModel.SteamViewModel).Shutdown();
+            App.Current.Shutdown();
+
         }
     }
 }

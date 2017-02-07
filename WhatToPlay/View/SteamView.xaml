@@ -43,7 +43,7 @@
         </Grid>
         
         <TextBlock Grid.Row="1" Text="Test"/>
-        <ItemsControl Grid.Row="2" ItemsSource="{Binding Friends}" Background="AliceBlue">
+        <ItemsControl Grid.Row="2" ItemsSource="{Binding Friends, IsAsync=True}" Background="AliceBlue">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <UniformGrid Columns="1"/>

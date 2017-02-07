@@ -109,7 +109,7 @@ namespace WhatToPlay.Model
             }
         }
 
-        public void Connect()
+        public void Start()
         {
             m_isRunning = true;
 
@@ -118,6 +118,16 @@ namespace WhatToPlay.Model
 
             //Connect to Steam
             m_steamClient.Connect();
+        }
+
+        public void Stop()
+        {
+            m_isRunning = false;
+            m_steamClient.Disconnect();
+            if (!m_steamKitThread.Join(TimeSpan.FromSeconds(2))) // give it 2 seconds to finish gracefully.
+            {
+                m_steamKitThread.Abort(); // if it hasn't finished gracefully, blow it away.
+            }
         }
 
         private void OnSteamMachineAuth(SteamUser.UpdateMachineAuthCallback callback)
@@ -236,7 +246,7 @@ namespace WhatToPlay.Model
             else if (callback.Result != EResult.OK)
             {
                 OnLogonFailure?.Invoke(this, string.Format("Unable to logon to Steam: {0} / {1}", callback.Result, callback.ExtendedResult));
-                
+
                 //Stop Everything (this isn't going to work on this attempt)
                 Stop();
             }
@@ -244,11 +254,6 @@ namespace WhatToPlay.Model
             {
                 OnLogonSuccess?.Invoke(this, string.Format("Successfully logged on!"));
             }
-        }
-
-        private void Stop()
-        {
-            m_isRunning = false;
         }
 
         private void RequestEmailAuthenticationCode()
@@ -277,7 +282,7 @@ namespace WhatToPlay.Model
             if (callback.Result != EResult.OK)
             {
                 OnConnectionFailure?.Invoke(this, string.Format("Unable to connect to Steam: {0}", callback.Result));
-                
+
                 Stop();
                 return;
             }
