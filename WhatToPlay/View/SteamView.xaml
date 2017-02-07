@@ -1,0 +1,61 @@
+﻿<UserControl x:Class="WhatToPlay.View.SteamView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WhatToPlay.View"
+             xmlns:Converters="clr-namespace:WhatToPlay.Converters"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="350">
+
+    <UserControl.Resources>
+        <Converters:BoolToVisibilityConverter x:Key="BoolToVisibility"/>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid>
+            
+        </Grid>
+        <Grid Grid.Row="0" Visibility="{Binding EmailAuthenticationRequired, Converter={StaticResource BoolToVisibility}}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="Enter Authentication Code received in E-mail:"/>
+            <TextBox Grid.Column="1" Width="50" Text="{Binding AuthenticationCode}"/>
+            <Button Grid.Column="2" Content="Submit" Command="{Binding EmailAuthenticationEntered}"/>
+        </Grid>
+        <Grid Grid.Row="0" Visibility="{Binding TwoFactorAuthenticationRequired, Converter={StaticResource BoolToVisibility}}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="Enter Two Factor Authentication from your Authenticator App:"/>
+            <TextBox Grid.Column="1" Width="50" Text="{Binding AuthenticationCode}"/>
+            <Button Grid.Column="2" Content="Submit" Command="{Binding EmailAuthenticationEntered}"/>
+        </Grid>
+        
+        <TextBlock Grid.Row="1" Text="Test"/>
+        <ItemsControl Grid.Row="2" ItemsSource="{Binding Friends}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <UniformGrid Columns="1"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding PersonaName}"/>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </Grid>
+</UserControl>
