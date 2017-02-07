@@ -13,8 +13,8 @@
         <ViewModel:SteamViewModel/>
     </Window.DataContext>
     
-        <StackPanel>
+        <Grid>
             <View:SteamView/>
-        </StackPanel>
+        </Grid>
 
 </Window>

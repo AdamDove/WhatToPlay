@@ -5,8 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:WhatToPlay.View"
              xmlns:Converters="clr-namespace:WhatToPlay.Converters"
-             mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="350">
+             mc:Ignorable="d">
 
     <UserControl.Resources>
         <Converters:BoolToVisibilityConverter x:Key="BoolToVisibility"/>
@@ -16,11 +15,10 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="100"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <Grid>
-            
-        </Grid>
+
         <Grid Grid.Row="0" Visibility="{Binding EmailAuthenticationRequired, Converter={StaticResource BoolToVisibility}}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
@@ -45,7 +43,7 @@
         </Grid>
         
         <TextBlock Grid.Row="1" Text="Test"/>
-        <ItemsControl Grid.Row="2" ItemsSource="{Binding Friends}">
+        <ItemsControl Grid.Row="2" ItemsSource="{Binding Friends}" Background="AliceBlue">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <UniformGrid Columns="1"/>
@@ -53,9 +51,12 @@
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding PersonaName}"/>
+                    <Grid>
+                        <TextBlock Height="50" Text="{Binding PersonaName}" Background="BlueViolet"/>
+                    </Grid>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
+        <TextBlock Grid.Row="3" Text="Bottom"/>
     </Grid>
 </UserControl>

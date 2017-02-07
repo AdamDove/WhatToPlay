@@ -72,6 +72,13 @@ namespace WhatToPlay.ViewModel
 
         public SteamViewModel()
         {
+            /* Add your info here and uncomment this section on the first run only.
+            Settings.Default.SteamUserName = "YourNameHere";
+            Settings.Default.SteamPassword = "YourPasswordHere";
+            Settings.Default.SteamAPIKey = "YouGetTheIdea";
+            Settings.Default.Save();
+            */
+
             //Yes I am aware that the following line won't work unless you manually set the Settings.  I'll add a prompt for this later.
             m_Steam = new Steam(Settings.Default.SteamUserName, Settings.Default.SteamPassword, Settings.Default.SteamAPIKey, this);
             m_Steam.OnFriendListUpdate += OnFriendListUpdateCallback;
@@ -84,6 +91,7 @@ namespace WhatToPlay.ViewModel
             if ((Friends != null) && !Friends.Any(f => f.SteamID == steamId))
             {
                 Friends.Add(m_Steam.Friends[steamId]);
+                Console.WriteLine("Adding Friend {0}", m_Steam.Friends[steamId].PersonaName);
                 RaisePropertyChangedEvent(nameof(Friends));
             }
         }
