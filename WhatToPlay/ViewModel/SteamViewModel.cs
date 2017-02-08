@@ -32,6 +32,7 @@ namespace WhatToPlay.ViewModel
                 RaisePropertyChangedEvent(nameof(Friends));
             }
         }
+
         public bool EmailAuthenticationRequired
         {
             get { return _emailAuthenticationRequired; }
@@ -83,7 +84,7 @@ namespace WhatToPlay.ViewModel
             m_Steam = new Steam(Settings.Default.SteamUserName, Settings.Default.SteamPassword, Settings.Default.SteamAPIKey, this);
             m_Steam.OnFriendListUpdate += OnFriendListUpdateCallback;
 
-            m_Steam.Connect();
+            m_Steam.Start();
         }
 
         private void OnFriendListUpdateCallback(object sender, long steamId)
@@ -122,5 +123,10 @@ namespace WhatToPlay.ViewModel
             }
             return AuthenticationCode;
         }
+        internal void Shutdown()
+        {
+            m_Steam.Stop();
+        }
+
     }
 }
