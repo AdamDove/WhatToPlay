@@ -49,6 +49,7 @@ namespace WhatToPlay.Model
         #region Properties
 
         public Dictionary<long, SteamProfile> Friends { get; private set; }
+        public long OwnSteamId { get { return (long)m_steamClient.SteamID.ConvertToUInt64(); } }
 
         #endregion Properties
 
