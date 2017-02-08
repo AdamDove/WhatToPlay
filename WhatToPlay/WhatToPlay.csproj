@@ -73,6 +73,9 @@
     </ApplicationDefinition>
     <Compile Include="Common\CommandDelegate.cs" />
     <Compile Include="Converters\BoolToVisibilityConverter.cs" />
+    <Compile Include="ViewModel\SteamGameAndMissingPlayerInfo.cs" />
+    <Compile Include="ViewModel\GamesAndPlayers.cs" />
+    <Compile Include="ViewModel\SteamGameInfo.cs" />
     <Compile Include="ViewModel\SteamViewModel.cs" />
     <Compile Include="View\SteamView.xaml.cs">
       <DependentUpon>SteamView.xaml</DependentUpon>
