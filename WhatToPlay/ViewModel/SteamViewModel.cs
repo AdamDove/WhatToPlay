@@ -82,7 +82,7 @@ namespace WhatToPlay.ViewModel
         {
             get { return new CommandDelegate(OnTwoFactorAuthenticationEntered, true); }
         }
-        public bool Connected { get; private set; }
+        public bool LoginRequired { get; private set; }
 
         private void OnTwoFactorAuthenticationEntered()
         {

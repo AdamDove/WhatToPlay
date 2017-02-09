@@ -7,7 +7,7 @@
         xmlns:ViewModel="clr-namespace:WhatToPlay.ViewModel"
         xmlns:View="clr-namespace:WhatToPlay.View"
         mc:Ignorable="d"
-        Title="What To Play" Height="350" Width="725">
+        Title="What To Play" Height="600" Width="800">
 
     <Window.DataContext>
         <ViewModel:SteamViewModel/>
