@@ -34,20 +34,6 @@ namespace WhatToPlay.ViewModel
             }
         }
 
-        public class SteamGameInfo
-        {
-            public SteamGameInfo(SteamProfileGame game)
-            {
-                SteamProfileGame = game;
-            }
-
-            public SteamProfileGame SteamProfileGame { get; set; }
-            public long ID { get { return SteamProfileGame.App.ID; } }
-            public string Name { get { return SteamProfileGame.App.Name; } }
-            public string HeaderURL { get { return string.Format("http://cdn4.steampowered.com/v/gfx/apps/{0}/header.jpg", SteamProfileGame.App.ID); } }
-            public string StoreImageURL { get { return string.Format("http://cdn.akamai.steamstatic.com/steam/apps/{0}/capsule_184x69.jpg", SteamProfileGame.App.ID); } }
-        }
-
         private List<SteamGameInfo> _CommonGameList = new List<SteamGameInfo>();
         public List<SteamGameInfo> CommonGameList
         {
@@ -58,6 +44,16 @@ namespace WhatToPlay.ViewModel
                 RaisePropertyChangedEvent(nameof(CommonGameList));
             }
         } 
+        private List<SteamGameAndMissingPlayerInfo> _CommonGameListMissingOnePlayer = new List<SteamGameAndMissingPlayerInfo>();
+        public List<SteamGameAndMissingPlayerInfo> CommonGameListMissingOnePlayer
+        {
+            get { return _CommonGameListMissingOnePlayer; }
+            set
+            {
+                _CommonGameListMissingOnePlayer = value;
+                RaisePropertyChangedEvent(nameof(CommonGameListMissingOnePlayer));
+            }
+        }
 
         public bool EmailAuthenticationRequired
         {
@@ -145,29 +141,13 @@ namespace WhatToPlay.ViewModel
 
         private void UpdateGamesInCommon()
         {
-            List<SteamProfileGame> games = null;
-            List<SteamGameInfo> newCommonList = new List<SteamGameInfo>();
-
             lock (m_friendLock)
             {
-                foreach (SteamProfile friend in Friends.Where(f => f.PersonaState != TinySteamWrapper.Steam.PersonaState.Offline))
-                {
-                    if (games == null)
-                    {
-                        games = friend.Games.ToList();
-                    }
-                    else
-                    {
-                        games = games.Where(g => friend.Games.Any(sg => sg.App.ID == g.App.ID)).ToList();
-                    }
-                }
-            }
-            foreach (SteamProfileGame game in games)
-            {
-                newCommonList.Add(new SteamGameInfo(game));
+                GamesAndPlayers gamesAndPlayers = new GamesAndPlayers(Friends);
+                CommonGameList = gamesAndPlayers.GetPerfectMatches();
+                CommonGameListMissingOnePlayer = gamesAndPlayers.GetOffByOneMatches();
             }
 
-            CommonGameList = newCommonList;
         }
 
         protected void RaisePropertyChangedEvent(string propertyName)

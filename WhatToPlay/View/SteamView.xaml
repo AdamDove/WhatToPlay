@@ -49,21 +49,26 @@
                 <Button Grid.Column="2" Content="Submit" Command="{Binding EmailAuthenticationEntered}"/>
             </Grid>
 
-            <Grid Grid.Row="1">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="150"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="150"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Column="0" >
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-
-                <TextBlock Grid.Row="0" Grid.Column="0" Text="FRIENDS" HorizontalAlignment="Center" FontWeight="ExtraBold"/>
-
+                <Border Grid.Row="0" BorderBrush="Black" BorderThickness="0,2,0,0">
+                    <TextBlock Text="FRIENDS" HorizontalAlignment="Center" Margin="13,8,8,3" FontWeight="ExtraBold"/>
+                </Border>
                 <!-- Friends List -->
-                <ScrollViewer Grid.Row="1" Grid.Column="0" VerticalScrollBarVisibility="Auto">
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
                     <ItemsControl ItemsSource="{Binding Friends, IsAsync=True}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
@@ -98,26 +103,66 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                 </ScrollViewer>
+            </Grid>
 
-                <!-- Spacer -->
-                <Rectangle Margin="1" Grid.Column="1" Grid.RowSpan="2" Width="2" RadiusX="1" RadiusY="1" Fill="Black"/>
+            <!-- Spacer -->
+            <Rectangle Margin="0" Grid.Column="1" Width="2" RadiusX="1" RadiusY="1" Fill="Black"/>
 
-                <TextBlock Grid.Row="0" Grid.Column="2" Text="COMMON GAMES" HorizontalAlignment="Center" FontWeight="ExtraBlack"/>
+            <Grid Grid.Column="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
 
-                <!-- Common Games -->
-                <ScrollViewer Grid.Row="1" Grid.Column="2" VerticalScrollBarVisibility="Auto">
-                    <ItemsControl ItemsSource="{Binding CommonGameList, IsAsync=True}">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <WrapPanel/>
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Image Source="{Binding StoreImageURL}" Width="184" Height="69"/>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
+                <Border Grid.Row="0" BorderBrush="Black" BorderThickness="0,2,0,0">
+                    <TextBlock Text="MATCHING GAMES" Margin="13,8,8,3" HorizontalAlignment="Center" FontWeight="ExtraBlack"/>
+                </Border>
+
+                <!-- Matching Games -->
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <ItemsControl ItemsSource="{Binding CommonGameList, IsAsync=True}"  >
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel Margin="3,3,3,3"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Image Source="{Binding StoreImageURL}" Width="184" Height="69"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <Border Grid.Row="2" BorderBrush="Black" BorderThickness="0,2,0,0">
+                    <TextBlock Text="SIMILAR GAMES (1 person missing)" Margin="13,8,8,3" HorizontalAlignment="Center" FontWeight="ExtraBlack" />
+                </Border>
+
+                <ScrollViewer Grid.Row="3" VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <ItemsControl ItemsSource="{Binding CommonGameListMissingOnePlayer, IsAsync=True}" >
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel Margin="3,3,3,3" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate  >
+                                <DataTemplate>
+                                    <StackPanel>
+                                        <Image Source="{Binding StoreImageURL}" Width="184" Height="69"/>
+                                        <Label Content="{Binding MissingPlayerName}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
                 </ScrollViewer>
             </Grid>
         </Grid>
