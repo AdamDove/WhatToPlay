@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using TinySteamWrapper;
+using WhatToPlay.ViewModel;
 
 namespace WhatToPlay.View
 {
@@ -24,6 +25,12 @@ namespace WhatToPlay.View
         public SteamView()
         {
             InitializeComponent();
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            SteamViewModel model = (DataContext as SteamViewModel);
+            model.Connect();
         }
     }
 }

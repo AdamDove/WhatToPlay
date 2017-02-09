@@ -9,6 +9,8 @@ using TinySteamWrapper;
 using SteamKit2;
 using WhatToPlay.Properties;
 using System.Threading;
+using System.Security;
+using WhatToPlay.ViewModel;
 
 namespace WhatToPlay.Model
 {
@@ -24,7 +26,7 @@ namespace WhatToPlay.Model
         private string m_TwoFactorAuth;
         private string m_AuthCode;
         private string m_SteamUserName;
-        private string m_SteamPassword;
+        private SecurePassword m_SteamPassword;
         private SteamFriends m_steamFriends;
         private ISteamGuardPromptHandler m_steamGuardPromptHandler;
 
@@ -53,18 +55,18 @@ namespace WhatToPlay.Model
 
         #endregion Properties
 
-        public Steam(string steamUserName, string steamPassword, string steamWebAPIKey, ISteamGuardPromptHandler steamGuardPromptHandler)
+        public Steam(string steamUserName, SecurePassword steamPassword, string steamWebAPIKey, ISteamGuardPromptHandler steamGuardPromptHandler)
             : this(steamUserName, steamPassword, steamWebAPIKey)
         {
             m_steamGuardPromptHandler = steamGuardPromptHandler;
         }
 
-        public Steam(string steamUserName, string steamPassword, string steamWebAPIKey)
+        public Steam(string steamUserName, SecurePassword steamPassword, string steamWebAPIKey)
         {
             //Check inputs for null (notify if incorrect outside of constructor)
             if (String.IsNullOrEmpty(steamUserName))
                 throw new ArgumentNullException("steamUserName");
-            if (String.IsNullOrEmpty(steamPassword))
+            if (steamPassword.Length==0)
                 throw new ArgumentNullException("steamPassword");
             if (String.IsNullOrEmpty(steamWebAPIKey))
                 throw new ArgumentNullException("steamWebAPIKey");
@@ -218,7 +220,7 @@ namespace WhatToPlay.Model
 
         private void OnSteamUserAccountInfo(SteamUser.AccountInfoCallback callback)
         {
-            ChangePersonaState(EPersonaState.LookingToPlay);
+            //ChangePersonaState(EPersonaState.LookingToPlay);
         }
 
         private void ChangePersonaState(EPersonaState personaState)
@@ -301,7 +303,7 @@ namespace WhatToPlay.Model
             m_steamUser.LogOn(new SteamUser.LogOnDetails
             {
                 Username = m_SteamUserName,
-                Password = m_SteamPassword,
+                Password = m_SteamPassword.ToPlainText(),
 
                 // this value will be null (which is the default) for our first logon attempt
                 AuthCode = m_AuthCode,

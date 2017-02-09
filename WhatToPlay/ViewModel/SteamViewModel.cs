@@ -10,14 +10,15 @@ using System.Windows.Input;
 using WhatToPlay.Common;
 using System.Collections.Generic;
 using WhatToPlay.Properties;
+using System.Security;
 
 namespace WhatToPlay.ViewModel
 {
     public class SteamViewModel : INotifyPropertyChanged, ISteamGuardPromptHandler
     {
         public event PropertyChangedEventHandler PropertyChanged;
-
-        private Steam m_Steam;
+        
+        private Steam m_Steam = null;
 
         private bool _twoFactorAuthenticationRequired = false;
         private bool _emailAuthenticationRequired = false;
@@ -83,8 +84,7 @@ namespace WhatToPlay.ViewModel
             get { return new CommandDelegate(OnTwoFactorAuthenticationEntered, true); }
         }
         public bool LoginRequired { get; private set; }
-        public string UserName { get; set; }
-        public string Password { get; set; }
+        public bool RememberMe { get; set; }
 
         private void OnTwoFactorAuthenticationEntered()
         {
@@ -105,8 +105,32 @@ namespace WhatToPlay.ViewModel
             Settings.Default.Save();
             */
 
+            /// select from settings the "rememberme" setting, 
+            /// if true, 
+            ///   get the username
+            ///   get the entropy
+            ///   go to protecteddata and get the password
+            ///   login
+            /// if false
+            ///   do nothing right now. 
+
+            if (Settings.Default.RememberMe)
+            {
+                Connect();
+            }
+        }
+        public void Connect()
+        {
+            if (Settings.Default.RememberMe)
+            {
+                SecurePassword password = new SecurePassword();
+
+            }
+        }
+        public void Connect(String username, SecureString password)
+        {
             //Yes I am aware that the following line won't work unless you manually set the Settings.  I'll add a prompt for this later.
-            m_Steam = new Steam(Settings.Default.SteamUserName, Settings.Default.SteamPassword, Settings.Default.SteamAPIKey, this);
+            m_Steam = new Steam(username, password, Settings.Default.SteamAPIKey, this);
             m_Steam.OnFriendListUpdate += OnFriendListUpdateCallback;
 
             m_Steam.Start();

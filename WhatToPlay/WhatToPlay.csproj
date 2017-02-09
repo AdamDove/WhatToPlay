@@ -49,6 +49,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Security" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -73,6 +74,7 @@
     </ApplicationDefinition>
     <Compile Include="Common\CommandDelegate.cs" />
     <Compile Include="Converters\BoolToVisibilityConverter.cs" />
+    <Compile Include="ViewModel\SecurePassword.cs" />
     <Compile Include="ViewModel\SteamGameAndMissingPlayerInfo.cs" />
     <Compile Include="ViewModel\GamesAndPlayers.cs" />
     <Compile Include="ViewModel\SteamGameInfo.cs" />

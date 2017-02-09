@@ -13,13 +13,14 @@
 
     <Grid>
         <!-- Login -->
-        <UniformGrid Columns="1" VerticalAlignment="Center" HorizontalAlignment="Center" Visibility="{Binding LoginRequired, Converter={StaticResource BoolToVisibility}}">
-            <TextBlock Text="Steam UserName"/>
-            <TextBox Text="{Binding UserName}"/>
-            <TextBlock Text="Steam Password"/>
-            <PasswordBox Name="PasswordBox" />
+        <UniformGrid Rows="3" Columns="2" VerticalAlignment="Center" HorizontalAlignment="Center" Visibility="{Binding LoginRequired, Converter={StaticResource BoolToVisibility}}">
+            <TextBlock Text="Steam UserName"/>            <TextBox Text="{Binding UserName}"/>        
+            <TextBlock Text="Steam Password"/>            <PasswordBox Name="PasswordBox" />
+            <CheckBox Content="Remember Me" IsChecked="{ Binding RememberMe }" />
+            <Button Content="Login" Click="Button_Click"/>
+
         </UniformGrid>
-        
+
         <!-- Main -->
         <Grid>
             <Grid.RowDefinitions>
