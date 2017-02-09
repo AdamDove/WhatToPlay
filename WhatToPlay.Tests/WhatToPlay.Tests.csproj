@@ -54,6 +54,7 @@
   <ItemGroup>
     <Compile Include="GamesAndPlayersTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SecurePasswordTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

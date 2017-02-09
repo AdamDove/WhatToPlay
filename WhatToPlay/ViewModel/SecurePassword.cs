@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Security;
 using System.Security.Cryptography;
 using System.Text;
@@ -8,64 +9,107 @@ using System.Threading.Tasks;
 
 namespace WhatToPlay.ViewModel
 {
-    /// <summary>
-    /// Source http://codereview.stackexchange.com/questions/15346/using-system-security-cryptography-protecteddata-do-you-see-any-issue-with-encr
-    /// Written by: Ankush : http://codereview.stackexchange.com/users/12783/ankush
-    /// </summary>
-    /// <param name="password"></param>
-    /// <param name="salt"></param>
-    /// <returns></returns>
-    class SecurePassword
+    public class SecurePassword
     {
-        static public string Encrypt(string password, string salt)
+        String salt = "WhatToPlayPasswordSalt";
+        SecureString localPassword;
+
+        public SecurePassword()
         {
-            byte[] passwordBytes = Encoding.Unicode.GetBytes(password);
-            byte[] saltBytes = Encoding.Unicode.GetBytes(salt);
 
-            byte[] cipherBytes = ProtectedData.Protect(passwordBytes, saltBytes, DataProtectionScope.CurrentUser);
-
-            return Convert.ToBase64String(cipherBytes);
         }
 
-        static public string Decrypt(string cipher, string salt)
+        public SecurePassword(SecureString securePassword, bool rememberPassword)
         {
-            byte[] cipherBytes = Convert.FromBase64String(cipher);
-            byte[] saltBytes = Encoding.Unicode.GetBytes(salt);
-
-            byte[] passwordBytes = ProtectedData.Unprotect(cipherBytes, saltBytes, DataProtectionScope.CurrentUser);
-
-            return Encoding.Unicode.GetString(passwordBytes);
+            localPassword = securePassword;
+            Properties.Settings.Default.RememberMe = rememberPassword;
+            if (rememberPassword)
+                Save();
+            else
+                Delete();
         }
 
-        public static string ConvertToUnsecureString(this SecureString securePassword)
+        public void Load()
         {
-            if (securePassword == null)
-                throw new ArgumentNullException("securePassword");
+            localPassword = Decrypt(Properties.Settings.Default.EncryptedPassword, salt);
+        }
 
-            IntPtr unmanagedString = IntPtr.Zero;
+        public void Save()
+        {
+            Properties.Settings.Default.RememberMe = true;
+            Properties.Settings.Default.EncryptedPassword = Encrypt(localPassword, salt);
+
+        }
+        public void Delete()
+        {
+            Properties.Settings.Default.RememberMe = false;
+            Properties.Settings.Default.EncryptedPassword = "";
+        }
+
+        public static string Encrypt(SecureString secureString, string salt)
+        {
+            IntPtr unmanagedPasswordString = IntPtr.Zero;
+            string managedInsecurePasswordString;
+            byte[] managedInsecurePasswordBytes;
             try
             {
-                unmanagedString = Marshal.SecureStringToGlobalAllocUnicode(securePassword);
-                return Marshal.PtrToStringUni(unmanagedString);
+                unmanagedPasswordString = Marshal.SecureStringToGlobalAllocUnicode(secureString);
+                managedInsecurePasswordString = Marshal.PtrToStringUni(unmanagedPasswordString);
+                managedInsecurePasswordBytes = Encoding.Unicode.GetBytes(managedInsecurePasswordString);
+                //clear text password is now in process memory              
+                byte[] saltBytes = Encoding.Unicode.GetBytes(salt);
+                byte[] encryptedBytes = ProtectedData.Protect(managedInsecurePasswordBytes, saltBytes, DataProtectionScope.CurrentUser);
+                return Convert.ToBase64String(encryptedBytes);
             }
             finally
             {
-                Marshal.ZeroFreeGlobalAllocUnicode(unmanagedString);
+                //clear text passwords are now all cleared out of memory again.
+                Marshal.ZeroFreeGlobalAllocUnicode(unmanagedPasswordString);
+                managedInsecurePasswordBytes = null;
+                managedInsecurePasswordString = null;
             }
         }
-
-        //[TestMethod()]
-        //public void EncryptDecryptTest()
-        //{
-        //    string password = "Gussme!";
-        //    string salt = new Random().Next().ToString();
-
-        //    string cipher = Authenticator.Encrypt(password, salt);
-        //    Assert.IsFalse(cipher.Contains(password), "Unable to encrypt");
-        //    Assert.IsFalse(cipher.Contains(salt), "Unable to encrypt");
-
-        //    string decipher = Authenticator.Decrypt(cipher, salt);
-        //    Assert.AreEqual(password, decipher);
-        //}
+        public static SecureString Decrypt(string encryptedString, string salt)
+        {
+            byte[] managedInsecurePasswordBytes;
+            string managedInsecurePasswordString;
+            try
+            {
+                byte[] encryptedBytes = Convert.FromBase64String(encryptedString);
+                byte[] saltBytes = Encoding.Unicode.GetBytes(salt);
+                managedInsecurePasswordBytes = ProtectedData.Unprotect(encryptedBytes, saltBytes, DataProtectionScope.CurrentUser);
+                managedInsecurePasswordString = System.Text.Encoding.Unicode.GetString(managedInsecurePasswordBytes);
+                SecureString secureString = new SecureString();
+                foreach (char c in managedInsecurePasswordString)
+                {
+                    secureString.AppendChar(c);
+                }
+                secureString.MakeReadOnly();
+                return secureString;
+            }
+            finally
+            {
+                managedInsecurePasswordBytes = null;
+                managedInsecurePasswordString = null;
+            }
+        }
+        public string ToPlainText()
+        {
+            return ToPlainText(localPassword);
+        }
+        public static string ToPlainText(SecureString password)
+        {
+            IntPtr unmanagedPasswordString = IntPtr.Zero;
+            try
+            {
+                unmanagedPasswordString = Marshal.SecureStringToGlobalAllocUnicode(password);
+                return Marshal.PtrToStringUni(unmanagedPasswordString);
+            }
+            finally
+            {
+                //clear text passwords are now all cleared out of memory again.
+                Marshal.ZeroFreeGlobalAllocUnicode(unmanagedPasswordString);
+            }
+        }
     }
 }

@@ -66,7 +66,7 @@ namespace WhatToPlay.Model
             //Check inputs for null (notify if incorrect outside of constructor)
             if (String.IsNullOrEmpty(steamUserName))
                 throw new ArgumentNullException("steamUserName");
-            if (steamPassword.Length==0)
+            if (steamPassword != null)
                 throw new ArgumentNullException("steamPassword");
             if (String.IsNullOrEmpty(steamWebAPIKey))
                 throw new ArgumentNullException("steamWebAPIKey");
@@ -126,8 +126,11 @@ namespace WhatToPlay.Model
         public void Stop()
         {
             m_isRunning = false;
-            m_steamClient.Disconnect();
-            if (!m_steamKitThread.Join(TimeSpan.FromSeconds(2))) // give it 2 seconds to finish gracefully.
+            if (m_steamClient != null)
+            {
+                m_steamClient.Disconnect();
+            }
+            if (m_steamKitThread != null && !m_steamKitThread.Join(TimeSpan.FromSeconds(2))) // give it 2 seconds to finish gracefully.
             {
                 m_steamKitThread.Abort(); // if it hasn't finished gracefully, blow it away.
             }

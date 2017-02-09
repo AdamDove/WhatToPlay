@@ -38,18 +38,6 @@ namespace WhatToPlay.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string SteamPassword {
-            get {
-                return ((string)(this["SteamPassword"]));
-            }
-            set {
-                this["SteamPassword"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string SteamAPIKey {
             get {
                 return ((string)(this["SteamAPIKey"]));
@@ -77,6 +65,30 @@ namespace WhatToPlay.Properties {
             }
             set {
                 this["SentryFileLocation"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string EncryptedPassword {
+            get {
+                return ((string)(this["EncryptedPassword"]));
+            }
+            set {
+                this["EncryptedPassword"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool RememberMe {
+            get {
+                return ((bool)(this["RememberMe"]));
+            }
+            set {
+                this["RememberMe"] = value;
             }
         }
     }

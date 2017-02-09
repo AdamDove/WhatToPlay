@@ -17,7 +17,7 @@ namespace WhatToPlay.ViewModel
     public class SteamViewModel : INotifyPropertyChanged, ISteamGuardPromptHandler
     {
         public event PropertyChangedEventHandler PropertyChanged;
-        
+
         private Steam m_Steam = null;
 
         private bool _twoFactorAuthenticationRequired = false;
@@ -44,7 +44,7 @@ namespace WhatToPlay.ViewModel
                 _CommonGameList = value;
                 RaisePropertyChangedEvent(nameof(CommonGameList));
             }
-        } 
+        }
         private List<SteamGameAndMissingPlayerInfo> _CommonGameListMissingOnePlayer = new List<SteamGameAndMissingPlayerInfo>();
         public List<SteamGameAndMissingPlayerInfo> CommonGameListMissingOnePlayer
         {
@@ -98,42 +98,25 @@ namespace WhatToPlay.ViewModel
 
         public SteamViewModel()
         {
-            /* Add your info here and uncomment this section on the first run only.
-            Settings.Default.SteamUserName = "YourNameHere";
-            Settings.Default.SteamPassword = "YourPasswordHere";
-            Settings.Default.SteamAPIKey = "YouGetTheIdea";
-            Settings.Default.Save();
-            */
-
-            /// select from settings the "rememberme" setting, 
-            /// if true, 
-            ///   get the username
-            ///   get the entropy
-            ///   go to protecteddata and get the password
-            ///   login
-            /// if false
-            ///   do nothing right now. 
-
             if (Settings.Default.RememberMe)
             {
-                Connect();
-            }
-        }
-        public void Connect()
-        {
-            if (Settings.Default.RememberMe)
-            {
+                String username = Settings.Default.SteamUserName;
                 SecurePassword password = new SecurePassword();
-
+                password.Load();
+                Connect(username, password);
+            }
+            else
+            {
+                LoginRequired = true;
             }
         }
-        public void Connect(String username, SecureString password)
+
+        public void Connect(String username, SecurePassword password)
         {
-            //Yes I am aware that the following line won't work unless you manually set the Settings.  I'll add a prompt for this later.
             m_Steam = new Steam(username, password, Settings.Default.SteamAPIKey, this);
             m_Steam.OnFriendListUpdate += OnFriendListUpdateCallback;
-
             m_Steam.Start();
+            LoginRequired = false;
         }
 
         private void OnFriendListUpdateCallback(object sender, long steamId)
@@ -183,7 +166,7 @@ namespace WhatToPlay.ViewModel
 
         public string GetEmailAuthenticationCode()
         {
-            Application.Current.Dispatcher.Invoke(new Action(() => {EmailAuthenticationRequired = true;}));
+            Application.Current.Dispatcher.Invoke(new Action(() => { EmailAuthenticationRequired = true; }));
 
             while (EmailAuthenticationRequired)
             {
@@ -205,7 +188,10 @@ namespace WhatToPlay.ViewModel
 
         internal void Shutdown()
         {
-            m_Steam.Stop();
+            if (m_Steam != null)
+            {
+                m_Steam.Stop();
+            }
         }
 
     }

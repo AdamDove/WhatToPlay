@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using TinySteamWrapper;
+using WhatToPlay.Properties;
 using WhatToPlay.ViewModel;
 
 namespace WhatToPlay.View
@@ -30,7 +31,22 @@ namespace WhatToPlay.View
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             SteamViewModel model = (DataContext as SteamViewModel);
-            model.Connect();
+            
+            bool rememberMe = cbxRememberMe.IsChecked.HasValue ? cbxRememberMe.IsChecked.Value : false;
+            string username = txtUserName.Text;
+
+            SecurePassword password = new SecurePassword(PasswordBox.SecurePassword, rememberMe);
+            if (rememberMe)
+            {
+                Settings.Default.SteamUserName = username;
+                Settings.Default.RememberMe = true;
+            }
+            else
+            {
+                Settings.Default.SteamUserName = "";
+                Settings.Default.RememberMe = false;
+            }
+            model.Connect(username, password);
         }
     }
 }
