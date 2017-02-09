@@ -15,7 +15,9 @@
         <!-- Login -->
         <UniformGrid Columns="1" VerticalAlignment="Center" HorizontalAlignment="Center" Visibility="{Binding LoginRequired, Converter={StaticResource BoolToVisibility}}">
             <TextBlock Text="Steam UserName"/>
-            <TextBox Text="Steam UserName"/>
+            <TextBox Text="{Binding UserName}"/>
+            <TextBlock Text="Steam Password"/>
+            <PasswordBox Name="PasswordBox" />
         </UniformGrid>
         
         <!-- Main -->
@@ -109,24 +111,24 @@
             <!-- Spacer -->
             <Rectangle Margin="0" Grid.Column="1" Width="2" RadiusX="1" RadiusY="1" Fill="Black"/>
 
-            <Grid Grid.Column="2">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
+            <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
 
-                <Border Grid.Row="0" BorderBrush="Black" BorderThickness="0,2,0,0">
-                    <TextBlock Text="MATCHING GAMES" Margin="13,8,8,3" HorizontalAlignment="Center" FontWeight="ExtraBlack"/>
-                </Border>
+                    <Border Grid.Row="0" BorderBrush="Black" BorderThickness="0,2,0,0">
+                        <TextBlock Text="MATCHING GAMES" Margin="13,8,8,3" HorizontalAlignment="Center" FontWeight="ExtraBlack"/>
+                    </Border>
 
-                <!-- Matching Games -->
-                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-                    <StackPanel>
+                    <!-- Matching Games -->
+                    <StackPanel Grid.Row="1">
                         <ItemsControl ItemsSource="{Binding CommonGameList, IsAsync=True}"  >
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
@@ -145,14 +147,12 @@
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
                     </StackPanel>
-                </ScrollViewer>
 
-                <Border Grid.Row="2" BorderBrush="Black" BorderThickness="0,2,0,0">
-                    <TextBlock Text="SIMILAR GAMES (1 person missing)" Margin="13,8,8,3" HorizontalAlignment="Center" FontWeight="ExtraBlack" />
-                </Border>
+                    <Border Grid.Row="2" BorderBrush="Black" BorderThickness="0,2,0,0">
+                        <TextBlock Text="SIMILAR GAMES (1 person missing)" Margin="13,8,8,3" HorizontalAlignment="Center" FontWeight="ExtraBlack" />
+                    </Border>
 
-                <ScrollViewer Grid.Row="3" VerticalScrollBarVisibility="Auto">
-                    <StackPanel>
+                    <StackPanel Grid.Row="3">
                         <ItemsControl ItemsSource="{Binding CommonGameListMissingOnePlayer, IsAsync=True}" >
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
@@ -174,8 +174,8 @@
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
                     </StackPanel>
-                </ScrollViewer>
-            </Grid>
+                </Grid>
+            </ScrollViewer>
         </Grid>
     </Grid>
 </UserControl>
