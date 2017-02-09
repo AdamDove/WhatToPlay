@@ -49,24 +49,25 @@ namespace WhatToPlay.ViewModel
         public static string Encrypt(SecureString secureString, string salt)
         {
             IntPtr unmanagedPasswordString = IntPtr.Zero;
-            string managedInsecurePasswordString;
-            byte[] managedInsecurePasswordBytes;
             try
             {
                 unmanagedPasswordString = Marshal.SecureStringToGlobalAllocUnicode(secureString);
-                managedInsecurePasswordString = Marshal.PtrToStringUni(unmanagedPasswordString);
-                managedInsecurePasswordBytes = Encoding.Unicode.GetBytes(managedInsecurePasswordString);
-                //clear text password is now in process memory              
                 byte[] saltBytes = Encoding.Unicode.GetBytes(salt);
-                byte[] encryptedBytes = ProtectedData.Protect(managedInsecurePasswordBytes, saltBytes, DataProtectionScope.CurrentUser);
+
+                //this next line is all done in one big stack so no variable ever holds the unencrypted value.
+                byte[] encryptedBytes = ProtectedData.Protect(
+                    Encoding.Unicode.GetBytes(                          //convert the managed string to a byte array
+                        Marshal.PtrToStringUni(unmanagedPasswordString) //convert the unmanaged string to a managed string
+                    ),
+                    saltBytes, 
+                    DataProtectionScope.CurrentUser);
+
                 return Convert.ToBase64String(encryptedBytes);
             }
             finally
             {
                 //clear text passwords are now all cleared out of memory again.
                 Marshal.ZeroFreeGlobalAllocUnicode(unmanagedPasswordString);
-                managedInsecurePasswordBytes = null;
-                managedInsecurePasswordString = null;
             }
         }
         public static SecureString Decrypt(string encryptedString, string salt)
