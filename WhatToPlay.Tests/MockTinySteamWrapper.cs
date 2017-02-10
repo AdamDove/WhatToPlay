@@ -66,9 +66,9 @@ namespace WhatToPlay.Tests
             profileGames.Add(new SteamProfileGame(game1, TimeSpan.FromHours(1)));
             profileGames.Add(new SteamProfileGame(game2, TimeSpan.FromHours(2)));
             profileGames.Add(new SteamProfileGame(game3, TimeSpan.FromHours(3)));
-            SetValue(profile, "Games", profileGames); 
+            SetValue(profile, "Games", profileGames);
 
-            profile.LastLogOff = new DateTime(2016,6,15);
+            profile.LastLogOff = new DateTime(2016, 6, 15);
             profile.PersonaName = "PersonaName1";
             profile.PersonaState = PersonaState.Online;
             profile.PersonaStateFlags = 23;

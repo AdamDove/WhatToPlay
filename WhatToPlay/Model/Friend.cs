@@ -10,7 +10,7 @@ namespace WhatToPlay.Model
 {
     public class Friend : SteamProfile
     {
-        public Friend(SteamProfile profile):base()
+        public Friend(SteamProfile profile) : base()
         {
             PropertyInfo[] properties = typeof(SteamProfile).GetProperties();
 
