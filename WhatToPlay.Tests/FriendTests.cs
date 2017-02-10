@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using TinySteamWrapper;
 using TinySteamWrapper.Steam;
@@ -14,10 +15,25 @@ namespace WhatToPlay.Tests
     public class FriendTests
     {
         [Test]
-        public void TestAllProperties()
+        public void TestAllPropertiesWithInitializeProperties()
         {
             SteamProfile profile = MockTinySteamWrapper.CreateSteamProfile();
-            Friend friend = new Friend(profile);
+            Friend friend = new Friend();
+            friend.InitializeProperties(profile);
+            AssertFriend(friend);
+
+        }
+        [Test]
+        public void TestAllPropertiesWithInitializeFields()
+        {
+            SteamProfile profile = MockTinySteamWrapper.CreateSteamProfile();
+            Friend friend = new Friend();
+            friend.InitializeFields(profile);
+            AssertFriend(friend);
+        }
+
+        private void AssertFriend(Friend friend)
+        {
             Assert.AreEqual("Avatar1", friend.Avatar);
             Assert.AreEqual("AvatarFull1", friend.AvatarFull);
             Assert.AreEqual("AvatarMedium1", friend.AvatarMedium);
@@ -43,7 +59,7 @@ namespace WhatToPlay.Tests
 
             Assert.AreEqual("Game3", game3.App.Name);
             Assert.AreEqual(103, game3.App.ID);
-            
+
             Assert.AreEqual(new DateTime(2016, 6, 15), friend.LastLogOff);
             Assert.AreEqual("PersonaName1", friend.PersonaName);
             Assert.AreEqual(PersonaState.Online, friend.PersonaState);
@@ -55,8 +71,43 @@ namespace WhatToPlay.Tests
             Assert.AreEqual("StateCode1", friend.StateCode);
             Assert.AreEqual(26, friend.SteamID);
             Assert.AreEqual(new DateTime(2016, 9, 21), friend.TimeCreated);
-
         }
-         
+
+        [Test]
+        public void NotifyPropertyChangedIsCalledOnInitializeProperties()
+        {
+            ManualResetEvent propertyChangedRaised = new ManualResetEvent(false);
+            SteamProfile profile = MockTinySteamWrapper.CreateSteamProfile();
+
+            Friend friend = new Friend();
+            friend.PropertyChanged += (o, e) => { propertyChangedRaised.Set(); };
+
+            bool isPropertyChangedRaisedBefore = propertyChangedRaised.WaitOne(0);
+            Assert.IsFalse(isPropertyChangedRaisedBefore, "the event should not been raised yet");
+            friend.InitializeProperties(profile);
+            //event is raised asynchronously, so give it 2 seconds to be called.
+            bool isPropertyChangedRaisedAfter = propertyChangedRaised.WaitOne(TimeSpan.FromSeconds(2));
+            Assert.IsTrue(isPropertyChangedRaisedAfter, "the event should have been raised by now");
+
+            Assert.AreEqual("Avatar1", friend.Avatar, "and at least 1 property should have been set");
+        }
+        [Test]
+        public void NotifyPropertyChangedIsNotCalledOnInitializeFields()
+        {
+            ManualResetEvent propertyChangedRaised = new ManualResetEvent(false);
+            SteamProfile profile = MockTinySteamWrapper.CreateSteamProfile();
+
+            Friend friend = new Friend();
+            friend.PropertyChanged += (o, e) => { propertyChangedRaised.Set(); };
+
+            bool isPropertyChangedRaisedBefore = propertyChangedRaised.WaitOne(0);
+            Assert.IsFalse(isPropertyChangedRaisedBefore, "the event should not been raised");
+            friend.InitializeFields(profile);
+            //event is raised asynchronously, so give it 2 seconds to be called.
+            bool isPropertyChangedRaisedAfter = propertyChangedRaised.WaitOne(TimeSpan.FromSeconds(2));
+            Assert.IsFalse(isPropertyChangedRaisedAfter, "the event should still not have been raised");
+
+            Assert.AreEqual("Avatar1", friend.Avatar, "and at least 1 property should have been set");
+        }
     }
 }
