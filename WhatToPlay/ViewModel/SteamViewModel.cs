@@ -23,20 +23,7 @@ namespace WhatToPlay.ViewModel
         private bool _twoFactorAuthenticationRequired = false;
         private bool _emailAuthenticationRequired = false;
 
-        public class Friend
-        {
-            public SteamProfile Profile { get; set; }
-
-            public Friend(SteamProfile profile)
-            {
-                Profile = profile;
-            }
-            public bool IsSelected
-            {
-                get;
-                set;
-            }
-        }
+       
         private object m_friendLock = new object();
         private List<Friend> _Friends = new List<Friend>();
         public List<Friend> Friends
@@ -135,7 +122,7 @@ namespace WhatToPlay.ViewModel
 
             lock (m_friendLock)
             {
-                if (!Friends.Any(f => f.Profile.SteamID == steamId))
+                if (!Friends.Any(f => f.SteamID == steamId))
                 {
                     //Friend is new to the list
                     Friends.Add(new Friend(m_Steam.Friends[steamId]));
@@ -144,7 +131,7 @@ namespace WhatToPlay.ViewModel
                 else
                 {
                     //Update existing Friend
-                    int index = Friends.FindIndex(f => f.Profile.SteamID == steamId);
+                    int index = Friends.FindIndex(f => f.SteamID == steamId);
                     Console.WriteLine("Updating Friend {0}", m_Steam.Friends[steamId].PersonaName);
                     Friends[index] = new Friend(m_Steam.Friends[steamId]);
                 }
@@ -157,7 +144,7 @@ namespace WhatToPlay.ViewModel
         {
             lock (m_friendLock)
             {
-                GamesAndPlayers gamesAndPlayers = new GamesAndPlayers(Friends.Where(f => f.IsSelected).Select(f => f.Profile).ToList());
+                GamesAndPlayers gamesAndPlayers = new GamesAndPlayers(Friends.Where(f => f.IsSelected).Select(f => (SteamProfile)f).ToList());
                 CommonGameList = gamesAndPlayers.GetPerfectMatches();
                 CommonGameListMissingOnePlayer = gamesAndPlayers.GetOffByOneMatches();
             }
