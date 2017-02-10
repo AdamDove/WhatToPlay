@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using TinySteamWrapper;
+using WhatToPlay.Model;
 using WhatToPlay.ViewModel;
 
 namespace WhatToPlay.Tests
@@ -13,39 +14,21 @@ namespace WhatToPlay.Tests
     [TestFixture]
     public class GamesAndPlayersTests
     {
-        public static Object CreateJsonApp()
-        {
-            Type type = typeof(SteamApp).Assembly.GetType("TinySteamWrapper.Steam.JsonApp");
-            var instance = type.Assembly.CreateInstance(type.FullName, false);
-            return instance;
-        }
-        public static SteamApp CreateSteamApp()
-        {
-            var type = typeof(SteamApp);
-            var jsonApp = CreateJsonApp();
-            var instance = type.Assembly.CreateInstance(type.FullName, false, BindingFlags.Instance | BindingFlags.NonPublic, null, new object[] { jsonApp }, null, null);
-            return (SteamApp)instance;
-        }
-        public static void SetValue<T>(T instance, string key, object value)
-        {
-            var prop = instance.GetType().GetProperty(key);
-            prop.SetValue(instance, value);
-        }
-
+     
         [Test]
         public void PerfectMatchesTest()
         {
             List<SteamProfile> Friends = new List<SteamProfile>();
 
-            SteamApp app1 = CreateSteamApp();
-            SetValue(app1, "Name", "Game1");
-            SetValue(app1, "ID", 101);
-            SteamApp app2 = CreateSteamApp();
-            SetValue(app2, "Name", "Game2");
-            SetValue(app2, "ID", 102);
-            SteamApp app3 = CreateSteamApp();
-            SetValue(app3, "Name", "Game3");
-            SetValue(app3, "ID", 103);
+            SteamApp app1 = MockTinySteamWrapper.CreateSteamApp();
+            MockTinySteamWrapper.SetValue(app1, "Name", "Game1");
+            MockTinySteamWrapper.SetValue(app1, "ID", 101);
+            SteamApp app2 = MockTinySteamWrapper.CreateSteamApp();
+            MockTinySteamWrapper.SetValue(app2, "Name", "Game2");
+            MockTinySteamWrapper.SetValue(app2, "ID", 102);
+            SteamApp app3 = MockTinySteamWrapper.CreateSteamApp();
+            MockTinySteamWrapper.SetValue(app3, "Name", "Game3");
+            MockTinySteamWrapper.SetValue(app3, "ID", 103);
 
             SteamProfileGame game1 = new SteamProfileGame(app1, TimeSpan.FromHours(1));
             SteamProfileGame game2 = new SteamProfileGame(app2, TimeSpan.FromHours(1));
@@ -73,12 +56,12 @@ namespace WhatToPlay.Tests
         {
             List<SteamProfile> Friends = new List<SteamProfile>();
 
-            SteamApp app1 = CreateSteamApp();
-            SetValue(app1, "Name", "Game1");
-            SetValue(app1, "ID", 101);
-            SteamApp app3 = CreateSteamApp();
-            SetValue(app3, "Name", "Game3");
-            SetValue(app3, "ID", 103);
+            SteamApp app1 = MockTinySteamWrapper.CreateSteamApp();
+            MockTinySteamWrapper.SetValue(app1, "Name", "Game1");
+            MockTinySteamWrapper.SetValue(app1, "ID", 101);
+            SteamApp app3 = MockTinySteamWrapper.CreateSteamApp();
+            MockTinySteamWrapper.SetValue(app3, "Name", "Game3");
+            MockTinySteamWrapper.SetValue(app3, "ID", 103);
 
             SteamProfileGame game1 = new SteamProfileGame(app1, TimeSpan.FromHours(1));
             SteamProfileGame gameCommon = new SteamProfileGame(app3, TimeSpan.FromHours(1));
@@ -103,18 +86,18 @@ namespace WhatToPlay.Tests
         {
             List<SteamProfile> Friends = new List<SteamProfile>();
 
-            SteamApp app1 = CreateSteamApp();
-            SetValue(app1, "Name", "Game1");
-            SetValue(app1, "ID", 101);
-            SteamApp app2 = CreateSteamApp();
-            SetValue(app2, "Name", "Game2");
-            SetValue(app2, "ID", 102);
-            SteamApp app3 = CreateSteamApp();
-            SetValue(app3, "Name", "Game3");
-            SetValue(app3, "ID", 103);
-            SteamApp appCommon = CreateSteamApp();
-            SetValue(appCommon, "Name", "GameCommon");
-            SetValue(appCommon, "ID", 999);
+            SteamApp app1 = MockTinySteamWrapper.CreateSteamApp();
+            MockTinySteamWrapper.SetValue(app1, "Name", "Game1");
+            MockTinySteamWrapper.SetValue(app1, "ID", 101);
+            SteamApp app2 = MockTinySteamWrapper.CreateSteamApp();
+            MockTinySteamWrapper.SetValue(app2, "Name", "Game2");
+            MockTinySteamWrapper.SetValue(app2, "ID", 102);
+            SteamApp app3 = MockTinySteamWrapper.CreateSteamApp();
+            MockTinySteamWrapper.SetValue(app3, "Name", "Game3");
+            MockTinySteamWrapper.SetValue(app3, "ID", 103);
+            SteamApp appCommon = MockTinySteamWrapper.CreateSteamApp();
+            MockTinySteamWrapper.SetValue(appCommon, "Name", "GameCommon");
+            MockTinySteamWrapper.SetValue(appCommon, "ID", 999);
 
             SteamProfileGame game1 = new SteamProfileGame(app1, TimeSpan.FromHours(1));
             SteamProfileGame game2 = new SteamProfileGame(app2, TimeSpan.FromHours(1));

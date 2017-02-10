@@ -4,8 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TinySteamWrapper;
+using WhatToPlay.ViewModel;
 
-namespace WhatToPlay.ViewModel
+namespace WhatToPlay.Model
 {
     /// <summary>
     /// </summary>
