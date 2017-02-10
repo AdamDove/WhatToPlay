@@ -52,7 +52,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FriendTests.cs" />
     <Compile Include="GamesAndPlayersTests.cs" />
+    <Compile Include="MockTinySteamWrapper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SecurePasswordTests.cs" />
   </ItemGroup>

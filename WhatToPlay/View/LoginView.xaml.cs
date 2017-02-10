@@ -32,7 +32,14 @@ namespace WhatToPlay.View
         public LoginView()
         {
             InitializeComponent();
-            ViewModel.PropertyChanged += LoginView_PropertyChanged;
+            //OnPropertyChanged: Invoke the LoginView_PropertyChanged method on the UI Thread.
+            ViewModel.PropertyChanged += (o, e) => { Application.Current.Dispatcher.Invoke(new Action(() => { LoginView_PropertyChanged(o, e); })); };
+            if (Settings.Default.RememberMe)
+            {
+                SecurePassword password = new SecurePassword();
+                password.Load();
+                //'password' has the securestring... just need to populate the txtPassword..?
+            }
         }
 
         private void Login_Click(object sender, RoutedEventArgs e)

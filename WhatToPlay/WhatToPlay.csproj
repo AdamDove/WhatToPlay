@@ -75,13 +75,17 @@
     <Compile Include="Common\CommandDelegate.cs" />
     <Compile Include="Converters\BoolToVisibilityConverter.cs" />
     <Compile Include="ViewModel\LoginViewModel.cs" />
+    <Compile Include="Model\Friend.cs" />
     <Compile Include="ViewModel\SecurePassword.cs" />
     <Compile Include="ViewModel\SteamGameAndMissingPlayerInfo.cs" />
-    <Compile Include="ViewModel\GamesAndPlayers.cs" />
+    <Compile Include="Model\GamesAndPlayers.cs" />
     <Compile Include="ViewModel\SteamGameInfo.cs" />
     <Compile Include="ViewModel\SteamViewModel.cs" />
     <Compile Include="View\LoginView.xaml.cs">
       <DependentUpon>LoginView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\FriendView.xaml.cs">
+      <DependentUpon>FriendView.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\SteamView.xaml.cs">
       <DependentUpon>SteamView.xaml</DependentUpon>
@@ -99,6 +103,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="View\LoginView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\FriendView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

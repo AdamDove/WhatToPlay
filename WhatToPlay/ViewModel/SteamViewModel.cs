@@ -11,6 +11,7 @@ using WhatToPlay.Common;
 using System.Collections.Generic;
 using WhatToPlay.Properties;
 using System.Security;
+using System.Reflection;
 
 namespace WhatToPlay.ViewModel
 {
@@ -20,9 +21,10 @@ namespace WhatToPlay.ViewModel
 
         private Steam m_Steam = null;
 
+       
         private object m_friendLock = new object();
-        private List<SteamProfile> _Friends = new List<SteamProfile>();
-        public List<SteamProfile> Friends
+        private List<Friend> _Friends = new List<Friend>();
+        public List<Friend> Friends
         {
             get { return _Friends; }
             set
@@ -66,19 +68,14 @@ namespace WhatToPlay.ViewModel
 
         private void OnFriendListUpdateCallback(object sender, long steamId)
         {
-            //Skip yourself
-            if (steamId == m_Steam.OwnSteamId)
-                return;
-
-            if (Friends == null)
-                return;
-
             lock (m_friendLock)
             {
                 if (!Friends.Any(f => f.SteamID == steamId))
                 {
                     //Friend is new to the list
-                    Friends.Add(m_Steam.Friends[steamId]);
+                    Friend newFriend = new Friend(m_Steam.Friends[steamId]);
+                    newFriend.PropertyChanged += FriendOnPropertyChanged;
+                    Friends.Add(newFriend);
                     Console.WriteLine("Adding Friend {0}", m_Steam.Friends[steamId].PersonaName);
                 }
                 else
@@ -86,18 +83,25 @@ namespace WhatToPlay.ViewModel
                     //Update existing Friend
                     int index = Friends.FindIndex(f => f.SteamID == steamId);
                     Console.WriteLine("Updating Friend {0}", m_Steam.Friends[steamId].PersonaName);
-                    Friends[index] = m_Steam.Friends[steamId];
+                    Friends[index] = new Friend(m_Steam.Friends[steamId]);
                 }
                 RaisePropertyChangedEvent(nameof(Friends));
             }
-            UpdateGamesInCommon();
+        }
+
+        private void FriendOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "IsSelected")
+            {
+                UpdateGamesInCommon();
+            }
         }
 
         private void UpdateGamesInCommon()
         {
             lock (m_friendLock)
             {
-                GamesAndPlayers gamesAndPlayers = new GamesAndPlayers(Friends);
+                GamesAndPlayers gamesAndPlayers = new GamesAndPlayers(Friends.Where(f => f.IsSelected).Select(f => (SteamProfile)f).ToList());
                 CommonGameList = gamesAndPlayers.GetPerfectMatches();
                 CommonGameListMissingOnePlayer = gamesAndPlayers.GetOffByOneMatches();
             }

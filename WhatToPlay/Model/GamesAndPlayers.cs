@@ -4,8 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TinySteamWrapper;
+using WhatToPlay.ViewModel;
 
-namespace WhatToPlay.ViewModel
+namespace WhatToPlay.Model
 {
     /// <summary>
     /// </summary>
@@ -21,7 +22,7 @@ namespace WhatToPlay.ViewModel
 
         public GamesAndPlayers(List<SteamProfile> Friends)
         {
-            foreach (SteamProfile friend in Friends.Where(f => f.PersonaState != TinySteamWrapper.Steam.PersonaState.Offline))
+            foreach (SteamProfile friend in Friends)
             {
                 foreach (var game in friend.Games)
                 {

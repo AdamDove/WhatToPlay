@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Security;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -92,6 +93,16 @@ namespace WhatToPlay.ViewModel
             {
                 _userName = value;
                 RaisePropertyChangedEvent(nameof(UserName));
+            }
+        }
+        private SecureString _securePassword;
+        public SecureString SecurePassword
+        {
+            get { return _securePassword; }
+            set
+            {
+                _securePassword = value;
+                RaisePropertyChangedEvent(nameof(SecurePassword));
             }
         }
 
