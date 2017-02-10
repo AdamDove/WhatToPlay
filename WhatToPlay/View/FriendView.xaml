@@ -51,9 +51,9 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <Image Grid.Column="0" Grid.RowSpan="2" Margin="0,0,5,0" Source="{Binding Profile.AvatarMedium}" Width="35" Height="35"/>
-                    <TextBlock Grid.Column="1" Grid.Row="0" Text="{Binding Profile.PersonaName}" FontWeight="Bold" />
-                    <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding Profile.PersonaState}" />
+                    <Image Grid.Column="0" Grid.RowSpan="2" Margin="0,0,5,0" Source="{Binding AvatarMedium}" Width="35" Height="35"/>
+                    <TextBlock Grid.Column="1" Grid.Row="0" Text="{Binding PersonaName}" FontWeight="Bold" />
+                    <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding PersonaState}" />
                 </Grid>
             </Border>
         </Grid>

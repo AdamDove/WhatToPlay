@@ -15,6 +15,7 @@ namespace WhatToPlay.Model
         {
             InitializeProperties(profile);
         }
+
         public void InitializeProperties(SteamProfile profile)
         {
             PropertyInfo[] properties = typeof(SteamProfile).GetProperties();

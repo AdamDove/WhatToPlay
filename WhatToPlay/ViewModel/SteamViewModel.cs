@@ -116,16 +116,14 @@ namespace WhatToPlay.ViewModel
 
         private void OnFriendListUpdateCallback(object sender, long steamId)
         {
-            //Skip yourself
-            if (Friends == null)
-                return;
-
             lock (m_friendLock)
             {
                 if (!Friends.Any(f => f.SteamID == steamId))
                 {
                     //Friend is new to the list
-                    Friends.Add(new Friend(m_Steam.Friends[steamId]));
+                    Friend newFriend = new Friend(m_Steam.Friends[steamId]);
+                    newFriend.PropertyChanged += FriendOnPropertyChanged;
+                    Friends.Add(newFriend);
                     Console.WriteLine("Adding Friend {0}", m_Steam.Friends[steamId].PersonaName);
                 }
                 else
@@ -137,7 +135,14 @@ namespace WhatToPlay.ViewModel
                 }
                 RaisePropertyChangedEvent(nameof(Friends));
             }
-            UpdateGamesInCommon();
+        }
+
+        private void FriendOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "IsSelected")
+            {
+                UpdateGamesInCommon();
+            }
         }
 
         private void UpdateGamesInCommon()

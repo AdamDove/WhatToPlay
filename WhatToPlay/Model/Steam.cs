@@ -193,7 +193,10 @@ namespace WhatToPlay.Model
                 if (friendProfile != null)
                 {
                     await SteamManager.LoadGamesForProfile(friendProfile);
-                    Friends[friendProfile.SteamID] = friendProfile;
+                    lock (Friends)
+                    {
+                        Friends[friendProfile.SteamID] = friendProfile;
+                    }
                     OnFriendListUpdate?.Invoke(this, friendProfile.SteamID);
                 }
             }

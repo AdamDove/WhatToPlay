@@ -22,7 +22,7 @@ namespace WhatToPlay.Model
 
         public GamesAndPlayers(List<SteamProfile> Friends)
         {
-            foreach (SteamProfile friend in Friends.Where(f => f.PersonaState != TinySteamWrapper.Steam.PersonaState.Offline))
+            foreach (SteamProfile friend in Friends)
             {
                 foreach (var game in friend.Games)
                 {
