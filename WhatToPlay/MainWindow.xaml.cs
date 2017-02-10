@@ -13,6 +13,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using WhatToPlay.Model;
+using WhatToPlay.ViewModel;
 
 namespace WhatToPlay
 {
@@ -21,9 +23,10 @@ namespace WhatToPlay
     /// </summary>
     public partial class MainWindow : Window
     {
-        public MainWindow()
+        public MainWindow(Steam steam)
         {
             InitializeComponent();
+            ((SteamViewModel)this.SteamView.DataContext).Initialize(steam);
         }
         protected override void OnClosing(CancelEventArgs e)
         {

@@ -9,6 +9,8 @@ using TinySteamWrapper;
 using SteamKit2;
 using WhatToPlay.Properties;
 using System.Threading;
+using System.Security;
+using WhatToPlay.ViewModel;
 
 namespace WhatToPlay.Model
 {
@@ -24,7 +26,7 @@ namespace WhatToPlay.Model
         private string m_TwoFactorAuth;
         private string m_AuthCode;
         private string m_SteamUserName;
-        private string m_SteamPassword;
+        private SecurePassword m_SteamPassword;
         private SteamFriends m_steamFriends;
         private ISteamGuardPromptHandler m_steamGuardPromptHandler;
 
@@ -53,30 +55,9 @@ namespace WhatToPlay.Model
 
         #endregion Properties
 
-        public Steam(string steamUserName, string steamPassword, string steamWebAPIKey, ISteamGuardPromptHandler steamGuardPromptHandler)
-            : this(steamUserName, steamPassword, steamWebAPIKey)
+        public Steam(ISteamGuardPromptHandler steamGuardPromptHandler)
         {
             m_steamGuardPromptHandler = steamGuardPromptHandler;
-        }
-
-        public Steam(string steamUserName, string steamPassword, string steamWebAPIKey)
-        {
-            //Check inputs for null (notify if incorrect outside of constructor)
-            if (String.IsNullOrEmpty(steamUserName))
-                throw new ArgumentNullException("steamUserName");
-            if (String.IsNullOrEmpty(steamPassword))
-                throw new ArgumentNullException("steamPassword");
-            if (String.IsNullOrEmpty(steamWebAPIKey))
-                throw new ArgumentNullException("steamWebAPIKey");
-
-            m_SteamUserName = steamUserName;
-            m_SteamPassword = steamPassword;
-
-            Friends = new Dictionary<long, SteamProfile>();
-
-            //Set the Steam Web API Key as we only need to do this once.
-            //This doesn't check whether the key is valid though.
-            SteamManager.SteamAPIKey = steamWebAPIKey;
 
             //Set up SteamKit
             m_steamClient = new SteamClient();
@@ -94,11 +75,55 @@ namespace WhatToPlay.Model
             m_callbackManager.Subscribe<SteamFriends.FriendAddedCallback>(OnFriendAdded);
             m_callbackManager.Subscribe<SteamUser.UpdateMachineAuthCallback>(OnSteamMachineAuth);
 
+            Friends = new Dictionary<long, SteamProfile>();
+        }
+
+        public void Login(string steamUserName, SecurePassword steamPassword, string steamWebAPIKey)
+        {
+            //Check inputs for null (notify if incorrect outside of constructor)
+            if (String.IsNullOrEmpty(steamUserName))
+                throw new ArgumentNullException("steamUserName");
+            if (steamPassword== null)
+                throw new ArgumentNullException("steamPassword");
+            if (String.IsNullOrEmpty(steamWebAPIKey))
+                throw new ArgumentNullException("steamWebAPIKey");
+
+            m_SteamUserName = steamUserName;
+            m_SteamPassword = steamPassword;
+
+
+            //Set the Steam Web API Key as we only need to do this once.
+            //This doesn't check whether the key is valid though.
+            SteamManager.SteamAPIKey = steamWebAPIKey;
+
+            // Connect to Steam
+            m_isRunning = true;
             //Create a thread to manage callbacks
             m_steamKitThread = new Thread(ManageCallbacks);
             m_steamKitThread.IsBackground = true;
+
+            //Start the Callback Manager thread
+            m_steamKitThread.Start();
+            m_steamClient.Connect();
         }
 
+        ManualResetEvent waitForLastCallback = new ManualResetEvent(false);
+        public void Stop()
+        {
+            waitForLastCallback.Reset();
+            m_steamClient.Disconnect();
+            waitForLastCallback.WaitOne(TimeSpan.FromSeconds(3));//give ManageCallbacks() 1 second to process the disconnect event.
+            m_isRunning = false;
+        }
+
+        public void Shutdown()
+        {
+            Stop();
+            if (m_steamKitThread != null && !m_steamKitThread.Join(TimeSpan.FromSeconds(2))) // give it 2 seconds to finish gracefully.
+            {
+                m_steamKitThread.Abort(); // if it hasn't finished gracefully, blow it away.
+            }
+        }
         /// <summary>
         ///   Blocking call to manage SteamKit CallbackManager.  Blocks while m_isRunning is true.
         /// </summary>
@@ -107,29 +132,10 @@ namespace WhatToPlay.Model
             while (m_isRunning)
             {
                 m_callbackManager.RunWaitCallbacks(Settings.Default.SteamCallbackManagerPeriod);
+                waitForLastCallback.Set(); //let stop() know i've run my last callbacks.
             }
         }
 
-        public void Start()
-        {
-            m_isRunning = true;
-
-            //Start the Callback Manager thread
-            m_steamKitThread.Start();
-
-            //Connect to Steam
-            m_steamClient.Connect();
-        }
-
-        public void Stop()
-        {
-            m_isRunning = false;
-            m_steamClient.Disconnect();
-            if (!m_steamKitThread.Join(TimeSpan.FromSeconds(2))) // give it 2 seconds to finish gracefully.
-            {
-                m_steamKitThread.Abort(); // if it hasn't finished gracefully, blow it away.
-            }
-        }
 
         private void OnSteamMachineAuth(SteamUser.UpdateMachineAuthCallback callback)
         {
@@ -221,7 +227,7 @@ namespace WhatToPlay.Model
 
         private void OnSteamUserAccountInfo(SteamUser.AccountInfoCallback callback)
         {
-            ChangePersonaState(EPersonaState.LookingToPlay);
+            //ChangePersonaState(EPersonaState.LookingToPlay);
         }
 
         private void ChangePersonaState(EPersonaState personaState)
@@ -251,7 +257,6 @@ namespace WhatToPlay.Model
             {
                 OnLogonFailure?.Invoke(this, string.Format("Unable to logon to Steam: {0} / {1}", callback.Result, callback.ExtendedResult));
 
-                //Stop Everything (this isn't going to work on this attempt)
                 Stop();
             }
             else
@@ -275,10 +280,6 @@ namespace WhatToPlay.Model
             // after recieving an AccountLogonDenied, we'll be disconnected from steam
             // so after we read an authcode from the user, we need to reconnect to begin the logon flow again
             OnDisconnected?.Invoke(this, "Disconnected from Steam, reconnecting in 5 seconds.");
-
-            Thread.Sleep(TimeSpan.FromSeconds(5));
-
-            m_steamClient.Connect();
         }
 
         private void OnSteamClientConnected(SteamClient.ConnectedCallback callback)
@@ -304,7 +305,7 @@ namespace WhatToPlay.Model
             m_steamUser.LogOn(new SteamUser.LogOnDetails
             {
                 Username = m_SteamUserName,
-                Password = m_SteamPassword,
+                Password = m_SteamPassword.ToPlainText(),
 
                 // this value will be null (which is the default) for our first logon attempt
                 AuthCode = m_AuthCode,

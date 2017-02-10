@@ -12,9 +12,8 @@
     <Window.DataContext>
         <ViewModel:SteamViewModel/>
     </Window.DataContext>
-    
-        <Grid>
-            <View:SteamView/>
-        </Grid>
+    <Grid>
+        <View:SteamView x:Name="SteamView"/>
+    </Grid>
 
 </Window>

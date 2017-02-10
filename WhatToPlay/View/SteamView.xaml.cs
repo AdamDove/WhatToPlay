@@ -13,6 +13,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using TinySteamWrapper;
+using WhatToPlay.Properties;
+using WhatToPlay.ViewModel;
 
 namespace WhatToPlay.View
 {
@@ -25,5 +27,7 @@ namespace WhatToPlay.View
         {
             InitializeComponent();
         }
+
+       
     }
 }
