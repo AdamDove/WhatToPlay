@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WhatToPlay.View"
         xmlns:ViewModel="clr-namespace:WhatToPlay.ViewModel"
+        xmlns:Converters="clr-namespace:WhatToPlay.Converters"
         mc:Ignorable="d"
         Title="Login" Height="300" Width="300">
 
@@ -12,15 +13,44 @@
         <ViewModel:LoginViewModel/>
     </Window.DataContext>
 
-    <!-- Login -->
-    <UniformGrid Rows="3" Columns="2" VerticalAlignment="Center" HorizontalAlignment="Center" Visibility="{Binding LoginRequired, Converter={StaticResource BoolToVisibility}}">
-        <TextBlock Text="Steam UserName"/>
-        <TextBox Name="txtUserName" Text="{Binding UserName}"/>
-        <TextBlock Text="Steam Password"/>
-        <PasswordBox Name="PasswordBox" />
-        <CheckBox Name="cbxRememberMe" Content="Remember Me" IsChecked="{ Binding RememberMe }" />
-        <Button Content="Login" Click="Button_Click"/>
+    <Window.Resources>
+        <Converters:BoolToVisibilityConverter x:Key="BoolToVisibility"/>
+    </Window.Resources>
 
-    </UniformGrid>
+    <StackPanel>
+        <!-- Login -->
+        <UniformGrid Rows="4" Columns="2" VerticalAlignment="Center" HorizontalAlignment="Center">
+            <TextBlock Text="Steam UserName"/>
+            <TextBox Name="txtUserName" Text="{Binding UserName}"/>
+            <TextBlock Text="Steam Password"/>
+            <PasswordBox Name="txtPassword" />
+            <CheckBox Name="cbxRememberMe" Content="Remember Me" Grid.ColumnSpan="2" IsChecked="{ Binding RememberMe }" />
+            <Button Content="Login" Name="btnLogin" Click="Login_Click"/>
+            <Button Content="Cancel" Click="Cancel_Click"/>
+        </UniformGrid>
 
+        <!-- Authentication Entry -->
+        <Grid Visibility="{Binding EmailAuthenticationRequired, Converter={StaticResource BoolToVisibility}}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="Enter Authentication Code received in E-mail:"/>
+            <TextBox Grid.Column="1" Width="50" Text="{Binding AuthenticationCode}"/>
+            <Button Grid.Column="2" Content="Submit" Command="{Binding EmailAuthenticationEntered}"/>
+        </Grid>
+        <Grid Grid.Row="0" Visibility="{Binding TwoFactorAuthenticationRequired, Converter={StaticResource BoolToVisibility}}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="Enter Two Factor Authentication from your Authenticator App:"/>
+            <TextBox Grid.Column="1" Width="50" Text="{Binding AuthenticationCode}"/>
+            <Button Grid.Column="2" Content="Submit" Command="{Binding EmailAuthenticationEntered}"/>
+        </Grid>
+    </StackPanel>
 </Window>

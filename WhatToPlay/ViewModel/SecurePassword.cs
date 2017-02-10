@@ -38,12 +38,14 @@ namespace WhatToPlay.ViewModel
         {
             Properties.Settings.Default.RememberMe = true;
             Properties.Settings.Default.EncryptedPassword = Encrypt(localPassword, salt);
+            Properties.Settings.Default.Save();
 
         }
         public void Delete()
         {
             Properties.Settings.Default.RememberMe = false;
             Properties.Settings.Default.EncryptedPassword = "";
+            Properties.Settings.Default.Save();
         }
 
         public static string Encrypt(SecureString secureString, string salt)

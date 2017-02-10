@@ -55,30 +55,9 @@ namespace WhatToPlay.Model
 
         #endregion Properties
 
-        public Steam(string steamUserName, SecurePassword steamPassword, string steamWebAPIKey, ISteamGuardPromptHandler steamGuardPromptHandler)
-            : this(steamUserName, steamPassword, steamWebAPIKey)
+        public Steam(ISteamGuardPromptHandler steamGuardPromptHandler)
         {
             m_steamGuardPromptHandler = steamGuardPromptHandler;
-        }
-
-        public Steam(string steamUserName, SecurePassword steamPassword, string steamWebAPIKey)
-        {
-            //Check inputs for null (notify if incorrect outside of constructor)
-            if (String.IsNullOrEmpty(steamUserName))
-                throw new ArgumentNullException("steamUserName");
-            if (steamPassword != null)
-                throw new ArgumentNullException("steamPassword");
-            if (String.IsNullOrEmpty(steamWebAPIKey))
-                throw new ArgumentNullException("steamWebAPIKey");
-
-            m_SteamUserName = steamUserName;
-            m_SteamPassword = steamPassword;
-
-            Friends = new Dictionary<long, SteamProfile>();
-
-            //Set the Steam Web API Key as we only need to do this once.
-            //This doesn't check whether the key is valid though.
-            SteamManager.SteamAPIKey = steamWebAPIKey;
 
             //Set up SteamKit
             m_steamClient = new SteamClient();
@@ -96,11 +75,53 @@ namespace WhatToPlay.Model
             m_callbackManager.Subscribe<SteamFriends.FriendAddedCallback>(OnFriendAdded);
             m_callbackManager.Subscribe<SteamUser.UpdateMachineAuthCallback>(OnSteamMachineAuth);
 
+            Friends = new Dictionary<long, SteamProfile>();
+        }
+
+        public void Login(string steamUserName, SecurePassword steamPassword, string steamWebAPIKey)
+        {
+            //Check inputs for null (notify if incorrect outside of constructor)
+            if (String.IsNullOrEmpty(steamUserName))
+                throw new ArgumentNullException("steamUserName");
+            if (steamPassword== null)
+                throw new ArgumentNullException("steamPassword");
+            if (String.IsNullOrEmpty(steamWebAPIKey))
+                throw new ArgumentNullException("steamWebAPIKey");
+
+            m_SteamUserName = steamUserName;
+            m_SteamPassword = steamPassword;
+
+
+            //Set the Steam Web API Key as we only need to do this once.
+            //This doesn't check whether the key is valid though.
+            SteamManager.SteamAPIKey = steamWebAPIKey;
+
+            // Connect to Steam
+            m_isRunning = true;
             //Create a thread to manage callbacks
             m_steamKitThread = new Thread(ManageCallbacks);
             m_steamKitThread.IsBackground = true;
+
+            //Start the Callback Manager thread
+            m_steamKitThread.Start();
+            m_steamClient.Connect();
         }
 
+        public void Stop()
+        {
+            // Disconnect from Steam
+            m_isRunning = false;
+            m_steamClient.Disconnect();
+        }
+
+        public void Shutdown()
+        {
+            Stop();
+            if (m_steamKitThread != null && !m_steamKitThread.Join(TimeSpan.FromSeconds(2))) // give it 2 seconds to finish gracefully.
+            {
+                m_steamKitThread.Abort(); // if it hasn't finished gracefully, blow it away.
+            }
+        }
         /// <summary>
         ///   Blocking call to manage SteamKit CallbackManager.  Blocks while m_isRunning is true.
         /// </summary>
@@ -112,29 +133,6 @@ namespace WhatToPlay.Model
             }
         }
 
-        public void Start()
-        {
-            m_isRunning = true;
-
-            //Start the Callback Manager thread
-            m_steamKitThread.Start();
-
-            //Connect to Steam
-            m_steamClient.Connect();
-        }
-
-        public void Stop()
-        {
-            m_isRunning = false;
-            if (m_steamClient != null)
-            {
-                m_steamClient.Disconnect();
-            }
-            if (m_steamKitThread != null && !m_steamKitThread.Join(TimeSpan.FromSeconds(2))) // give it 2 seconds to finish gracefully.
-            {
-                m_steamKitThread.Abort(); // if it hasn't finished gracefully, blow it away.
-            }
-        }
 
         private void OnSteamMachineAuth(SteamUser.UpdateMachineAuthCallback callback)
         {

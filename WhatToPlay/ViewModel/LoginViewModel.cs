@@ -17,15 +17,12 @@ namespace WhatToPlay.ViewModel
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private Steam m_Steam = null;
-        public Steam Steam { get { return m_Steam; } }
-        private bool _twoFactorAuthenticationRequired = false;
-        private bool _emailAuthenticationRequired = false;
+        private Steam _steam = null;
+        public Steam Steam { get { return _steam; } }
 
-        protected void RaisePropertyChangedEvent(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+        public string AuthenticationCode { get; set; }
+
+        private bool _emailAuthenticationRequired = false;
         public bool EmailAuthenticationRequired
         {
             get { return _emailAuthenticationRequired; }
@@ -35,6 +32,8 @@ namespace WhatToPlay.ViewModel
                 RaisePropertyChangedEvent(nameof(EmailAuthenticationRequired));
             }
         }
+        
+        private bool _twoFactorAuthenticationRequired = false;
         public bool TwoFactorAuthenticationRequired
         {
             get { return _twoFactorAuthenticationRequired; }
@@ -44,7 +43,7 @@ namespace WhatToPlay.ViewModel
                 RaisePropertyChangedEvent(nameof(TwoFactorAuthenticationRequired));
             }
         }
-        public string AuthenticationCode { get; set; }
+       
         public ICommand EmailAuthenticationEntered
         {
             get { return new CommandDelegate(OnEmailAuthencationEntered, true); }
@@ -53,28 +52,78 @@ namespace WhatToPlay.ViewModel
         {
             get { return new CommandDelegate(OnTwoFactorAuthenticationEntered, true); }
         }
-        public bool LoginRequired { get; private set; }
-        public bool RememberMe { get; set; }
-
-        public void Login()
+        
+        private bool _loginSucceeded = false;
+        public bool LoginSucceeded
         {
-            if (Settings.Default.RememberMe)
+            get { return _loginSucceeded; }
+            set
             {
-                String username = Settings.Default.SteamUserName;
-                SecurePassword password = new SecurePassword();
-                password.Load();
-                Connect(username, password);
-            }
-            else
-            {
-                LoginRequired = true;
+                _loginSucceeded = value;
+                RaisePropertyChangedEvent(nameof(LoginSucceeded));
             }
         }
+        private bool _loginInProgress = false;
+        public bool LoginInProgress
+        {
+            get { return _loginInProgress; }
+            set
+            {
+                _loginInProgress = value;
+                RaisePropertyChangedEvent(nameof(LoginInProgress));
+            }
+        }
+
+        private bool _rememberMe = false;
+        public bool RememberMe
+        {
+            get { return _rememberMe; }
+            set
+            {
+                _rememberMe = value;
+                RaisePropertyChangedEvent(nameof(RememberMe));
+            }
+        }
+        private String _userName = "";
+        public String UserName
+        {
+            get { return _userName; }
+            set
+            {
+                _userName = value;
+                RaisePropertyChangedEvent(nameof(UserName));
+            }
+        }
+
+        public LoginViewModel()
+        {
+            _steam = new Steam(this);
+            _steam.OnLogonSuccess += _steam_OnLogonSuccess;
+            _steam.OnLogonFailure += _steam_OnLogonFailure;
+
+            RememberMe = Settings.Default.RememberMe;
+            if (RememberMe)
+            {
+                UserName = Settings.Default.SteamUserName;
+            }
+        }
+
+        private void _steam_OnLogonFailure(object sender, string message)
+        {
+            LoginInProgress = false;
+            LoginSucceeded = false;
+        }
+
+        private void _steam_OnLogonSuccess(object sender, string message)
+        {
+            LoginInProgress = false;
+            LoginSucceeded = true;
+        }
+
         public void Connect(String username, SecurePassword password)
         {
-            m_Steam = new Steam(username, password, Settings.Default.SteamAPIKey, this);
-            m_Steam.Start();
-            LoginRequired = false;
+            LoginInProgress = true;
+            _steam.Login(username, password, Settings.Default.SteamAPIKey);
         }
 
         private void OnTwoFactorAuthenticationEntered()
@@ -107,6 +156,10 @@ namespace WhatToPlay.ViewModel
                 Thread.Sleep(250);
             }
             return AuthenticationCode;
+        }
+        protected void RaisePropertyChangedEvent(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }
