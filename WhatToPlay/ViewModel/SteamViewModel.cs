@@ -10,6 +10,7 @@ using System.Windows.Input;
 using WhatToPlay.Common;
 using System.Collections.Generic;
 using WhatToPlay.Properties;
+using System.Reflection;
 
 namespace WhatToPlay.ViewModel
 {
@@ -22,9 +23,23 @@ namespace WhatToPlay.ViewModel
         private bool _twoFactorAuthenticationRequired = false;
         private bool _emailAuthenticationRequired = false;
 
+        public class Friend
+        {
+            public SteamProfile Profile { get; set; }
+
+            public Friend(SteamProfile profile)
+            {
+                Profile = profile;
+            }
+            public bool IsSelected
+            {
+                get;
+                set;
+            }
+        }
         private object m_friendLock = new object();
-        private List<SteamProfile> _Friends = new List<SteamProfile>();
-        public List<SteamProfile> Friends
+        private List<Friend> _Friends = new List<Friend>();
+        public List<Friend> Friends
         {
             get { return _Friends; }
             set
@@ -115,26 +130,23 @@ namespace WhatToPlay.ViewModel
         private void OnFriendListUpdateCallback(object sender, long steamId)
         {
             //Skip yourself
-            if (steamId == m_Steam.OwnSteamId)
-                return;
-
             if (Friends == null)
                 return;
 
             lock (m_friendLock)
             {
-                if (!Friends.Any(f => f.SteamID == steamId))
+                if (!Friends.Any(f => f.Profile.SteamID == steamId))
                 {
                     //Friend is new to the list
-                    Friends.Add(m_Steam.Friends[steamId]);
+                    Friends.Add(new Friend(m_Steam.Friends[steamId]));
                     Console.WriteLine("Adding Friend {0}", m_Steam.Friends[steamId].PersonaName);
                 }
                 else
                 {
                     //Update existing Friend
-                    int index = Friends.FindIndex(f => f.SteamID == steamId);
+                    int index = Friends.FindIndex(f => f.Profile.SteamID == steamId);
                     Console.WriteLine("Updating Friend {0}", m_Steam.Friends[steamId].PersonaName);
-                    Friends[index] = m_Steam.Friends[steamId];
+                    Friends[index] = new Friend(m_Steam.Friends[steamId]);
                 }
                 RaisePropertyChangedEvent(nameof(Friends));
             }
@@ -145,7 +157,7 @@ namespace WhatToPlay.ViewModel
         {
             lock (m_friendLock)
             {
-                GamesAndPlayers gamesAndPlayers = new GamesAndPlayers(Friends);
+                GamesAndPlayers gamesAndPlayers = new GamesAndPlayers(Friends.Where(f => f.IsSelected).Select(f => f.Profile).ToList());
                 CommonGameList = gamesAndPlayers.GetPerfectMatches();
                 CommonGameListMissingOnePlayer = gamesAndPlayers.GetOffByOneMatches();
             }

@@ -77,6 +77,9 @@
     <Compile Include="ViewModel\GamesAndPlayers.cs" />
     <Compile Include="ViewModel\SteamGameInfo.cs" />
     <Compile Include="ViewModel\SteamViewModel.cs" />
+    <Compile Include="View\FriendView.xaml.cs">
+      <DependentUpon>FriendView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\SteamView.xaml.cs">
       <DependentUpon>SteamView.xaml</DependentUpon>
     </Compile>
@@ -92,6 +95,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="View\FriendView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\SteamView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
