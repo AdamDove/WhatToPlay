@@ -95,14 +95,13 @@ namespace WhatToPlay.ViewModel
                 RaisePropertyChangedEvent(nameof(UserName));
             }
         }
-        private SecureString _securePassword;
-        public SecureString SecurePassword
+        private SecurePassword _securePassword;
+        public SecurePassword SecurePassword
         {
             get { return _securePassword; }
             set
             {
                 _securePassword = value;
-                RaisePropertyChangedEvent(nameof(SecurePassword));
             }
         }
 
@@ -116,6 +115,7 @@ namespace WhatToPlay.ViewModel
             if (RememberMe)
             {
                 UserName = Settings.Default.SteamUserName;
+                SecurePassword = SecurePassword.Load();
             }
         }
 
@@ -131,6 +131,13 @@ namespace WhatToPlay.ViewModel
             LoginSucceeded = true;
         }
 
+        public void Connect()
+        {
+            if (RememberMe)
+            {
+                Connect(UserName, SecurePassword);
+            }
+        }
         public void Connect(String username, SecurePassword password)
         {
             LoginInProgress = true;

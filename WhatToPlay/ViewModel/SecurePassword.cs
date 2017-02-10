@@ -11,7 +11,7 @@ namespace WhatToPlay.ViewModel
 {
     public class SecurePassword
     {
-        String salt = "WhatToPlayPasswordSalt";
+        private static String salt = "WhatToPlayPasswordSalt";
         SecureString localPassword;
 
         public SecurePassword()
@@ -19,29 +19,30 @@ namespace WhatToPlay.ViewModel
 
         }
 
-        public SecurePassword(SecureString securePassword, bool rememberPassword)
+        public SecurePassword(SecureString securePassword)
         {
             localPassword = securePassword;
-            Properties.Settings.Default.RememberMe = rememberPassword;
-            if (rememberPassword)
-                Save();
-            else
-                Delete();
         }
 
-        public void Load()
+        public static SecurePassword Load()
         {
+            SecurePassword password = new SecurePassword();
+            password.LoadFromDisk();
+            return password;
+        }
+        private void LoadFromDisk()
+        { 
             localPassword = Decrypt(Properties.Settings.Default.EncryptedPassword, salt);
         }
 
-        public void Save()
+        public void SaveToDisk()
         {
             Properties.Settings.Default.RememberMe = true;
             Properties.Settings.Default.EncryptedPassword = Encrypt(localPassword, salt);
             Properties.Settings.Default.Save();
 
         }
-        public void Delete()
+        public void DeleteFromDisk()
         {
             Properties.Settings.Default.RememberMe = false;
             Properties.Settings.Default.EncryptedPassword = "";

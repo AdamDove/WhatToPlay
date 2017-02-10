@@ -107,11 +107,13 @@ namespace WhatToPlay.Model
             m_steamClient.Connect();
         }
 
+        ManualResetEvent waitForLastCallback = new ManualResetEvent(false);
         public void Stop()
         {
-            // Disconnect from Steam
-            m_isRunning = false;
+            waitForLastCallback.Reset();
             m_steamClient.Disconnect();
+            waitForLastCallback.WaitOne(TimeSpan.FromSeconds(3));//give ManageCallbacks() 1 second to process the disconnect event.
+            m_isRunning = false;
         }
 
         public void Shutdown()
@@ -130,6 +132,7 @@ namespace WhatToPlay.Model
             while (m_isRunning)
             {
                 m_callbackManager.RunWaitCallbacks(Settings.Default.SteamCallbackManagerPeriod);
+                waitForLastCallback.Set(); //let stop() know i've run my last callbacks.
             }
         }
 
@@ -254,7 +257,6 @@ namespace WhatToPlay.Model
             {
                 OnLogonFailure?.Invoke(this, string.Format("Unable to logon to Steam: {0} / {1}", callback.Result, callback.ExtendedResult));
 
-                //Stop Everything (this isn't going to work on this attempt)
                 Stop();
             }
             else
@@ -278,10 +280,6 @@ namespace WhatToPlay.Model
             // after recieving an AccountLogonDenied, we'll be disconnected from steam
             // so after we read an authcode from the user, we need to reconnect to begin the logon flow again
             OnDisconnected?.Invoke(this, "Disconnected from Steam, reconnecting in 5 seconds.");
-
-            Thread.Sleep(TimeSpan.FromSeconds(5));
-
-            m_steamClient.Connect();
         }
 
         private void OnSteamClientConnected(SteamClient.ConnectedCallback callback)

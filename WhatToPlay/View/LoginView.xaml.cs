@@ -34,12 +34,17 @@ namespace WhatToPlay.View
             InitializeComponent();
             //OnPropertyChanged: Invoke the LoginView_PropertyChanged method on the UI Thread.
             ViewModel.PropertyChanged += (o, e) => { Application.Current.Dispatcher.Invoke(new Action(() => { LoginView_PropertyChanged(o, e); })); };
+            if (Settings.Default.RememberMe)
+            {
+                txtPassword.Password = ViewModel.SecurePassword.ToPlainText();
+                ViewModel.Connect();
+            }
         }
 
         private void Login_Click(object sender, RoutedEventArgs e)
         {
             bool rememberMe = cbxRememberMe.IsChecked.HasValue ? cbxRememberMe.IsChecked.Value : false;
-            SecurePassword password = new SecurePassword(txtPassword.SecurePassword, rememberMe);
+            SecurePassword password = new SecurePassword(txtPassword.SecurePassword);
             Login(rememberMe, password);
         }
         private void Login(bool rememberMe, SecurePassword password)
@@ -51,12 +56,14 @@ namespace WhatToPlay.View
                 Settings.Default.SteamUserName = username;
                 Settings.Default.RememberMe = true;
                 Settings.Default.Save();
+                password.SaveToDisk();
             }
             else
             {
                 Settings.Default.SteamUserName = "";
                 Settings.Default.RememberMe = false;
                 Settings.Default.Save();
+                password.DeleteFromDisk();
             }
             ViewModel.Connect(username, password);
         }
