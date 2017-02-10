@@ -12,15 +12,6 @@
     </UserControl.Resources>
 
     <Grid>
-        <!-- Login -->
-        <UniformGrid Rows="3" Columns="2" VerticalAlignment="Center" HorizontalAlignment="Center" Visibility="{Binding LoginRequired, Converter={StaticResource BoolToVisibility}}">
-            <TextBlock Text="Steam UserName"/>            <TextBox Name="txtUserName" Text="{Binding UserName}"/>        
-            <TextBlock Text="Steam Password"/>            <PasswordBox Name="PasswordBox" />
-            <CheckBox Name="cbxRememberMe" Content="Remember Me" IsChecked="{ Binding RememberMe }" />
-            <Button Content="Login" Click="Button_Click"/>
-
-        </UniformGrid>
-
         <!-- Main -->
         <Grid>
             <Grid.RowDefinitions>

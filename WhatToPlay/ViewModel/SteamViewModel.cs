@@ -14,14 +14,11 @@ using System.Security;
 
 namespace WhatToPlay.ViewModel
 {
-    public class SteamViewModel : INotifyPropertyChanged, ISteamGuardPromptHandler
+    public class SteamViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
         private Steam m_Steam = null;
-
-        private bool _twoFactorAuthenticationRequired = false;
-        private bool _emailAuthenticationRequired = false;
 
         private object m_friendLock = new object();
         private List<SteamProfile> _Friends = new List<SteamProfile>();
@@ -45,6 +42,7 @@ namespace WhatToPlay.ViewModel
                 RaisePropertyChangedEvent(nameof(CommonGameList));
             }
         }
+
         private List<SteamGameAndMissingPlayerInfo> _CommonGameListMissingOnePlayer = new List<SteamGameAndMissingPlayerInfo>();
         public List<SteamGameAndMissingPlayerInfo> CommonGameListMissingOnePlayer
         {
@@ -56,67 +54,14 @@ namespace WhatToPlay.ViewModel
             }
         }
 
-        public bool EmailAuthenticationRequired
-        {
-            get { return _emailAuthenticationRequired; }
-            set
-            {
-                _emailAuthenticationRequired = value;
-                RaisePropertyChangedEvent(nameof(EmailAuthenticationRequired));
-            }
-        }
-        public bool TwoFactorAuthenticationRequired
-        {
-            get { return _twoFactorAuthenticationRequired; }
-            set
-            {
-                _twoFactorAuthenticationRequired = value;
-                RaisePropertyChangedEvent(nameof(TwoFactorAuthenticationRequired));
-            }
-        }
-        public string AuthenticationCode { get; set; }
-        public ICommand EmailAuthenticationEntered
-        {
-            get { return new CommandDelegate(OnEmailAuthencationEntered, true); }
-        }
-        public ICommand TwoFactorAuthenticationEntered
-        {
-            get { return new CommandDelegate(OnTwoFactorAuthenticationEntered, true); }
-        }
-        public bool LoginRequired { get; private set; }
-        public bool RememberMe { get; set; }
-
-        private void OnTwoFactorAuthenticationEntered()
-        {
-            TwoFactorAuthenticationRequired = false;
-        }
-
-        private void OnEmailAuthencationEntered()
-        {
-            EmailAuthenticationRequired = false;
-        }
-
         public SteamViewModel()
         {
-            if (Settings.Default.RememberMe)
-            {
-                String username = Settings.Default.SteamUserName;
-                SecurePassword password = new SecurePassword();
-                password.Load();
-                Connect(username, password);
-            }
-            else
-            {
-                LoginRequired = true;
-            }
         }
 
-        public void Connect(String username, SecurePassword password)
+        public void Initialize(Steam steam)
         {
-            m_Steam = new Steam(username, password, Settings.Default.SteamAPIKey, this);
+            this.m_Steam = steam;
             m_Steam.OnFriendListUpdate += OnFriendListUpdateCallback;
-            m_Steam.Start();
-            LoginRequired = false;
         }
 
         private void OnFriendListUpdateCallback(object sender, long steamId)
@@ -162,28 +107,6 @@ namespace WhatToPlay.ViewModel
         protected void RaisePropertyChangedEvent(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        public string GetEmailAuthenticationCode()
-        {
-            Application.Current.Dispatcher.Invoke(new Action(() => { EmailAuthenticationRequired = true; }));
-
-            while (EmailAuthenticationRequired)
-            {
-                Thread.Sleep(250);
-            }
-            return AuthenticationCode;
-        }
-
-        public string GetTwoFactorAuthenticationCode()
-        {
-            Application.Current.Dispatcher.Invoke(new Action(() => { TwoFactorAuthenticationRequired = true; }));
-
-            while (TwoFactorAuthenticationRequired)
-            {
-                Thread.Sleep(250);
-            }
-            return AuthenticationCode;
         }
 
         internal void Shutdown()
