@@ -12,8 +12,19 @@
     <Window.DataContext>
         <ViewModel:SteamViewModel/>
     </Window.DataContext>
-    <Grid>
-        <View:SteamView x:Name="SteamView"/>
-    </Grid>
-
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="_File">
+                <MenuItem Header="_Disconnect" Click="Disconnect_Click"/>
+                <MenuItem Header="E_xit" Click="Exit_Click"/>
+            </MenuItem>
+            <MenuItem Header="_Settings">
+                <MenuItem IsCheckable="True" IsChecked="{Binding ShouldIncludeThisAccount, Mode=TwoWay}" Header="_Include This Account"/>
+                <MenuItem IsCheckable="True" IsChecked="{Binding ShouldShowOfflineUsers, Mode=TwoWay}" Header="_Show Offline Users"/>
+            </MenuItem>
+        </Menu>
+        <Grid>
+            <View:SteamView x:Name="SteamView"/>
+        </Grid>
+    </DockPanel>
 </Window>

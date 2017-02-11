@@ -95,6 +95,16 @@ namespace WhatToPlay.ViewModel
                 RaisePropertyChangedEvent(nameof(UserName));
             }
         }
+        private String _errorMessage = "";
+        public String ErrorMessage
+        {
+            get { return _errorMessage; }
+            set
+            {
+                _errorMessage = value;
+                RaisePropertyChangedEvent(nameof(ErrorMessage));
+            }
+        }
         private SecurePassword _securePassword;
         public SecurePassword SecurePassword
         {
@@ -110,6 +120,7 @@ namespace WhatToPlay.ViewModel
             _steam = new Steam(this);
             _steam.OnLogonSuccess += _steam_OnLogonSuccess;
             _steam.OnLogonFailure += _steam_OnLogonFailure;
+            _steam.OnLoggedOff += _steam_OnLoggedOff;
 
             RememberMe = Settings.Default.RememberMe;
             if (RememberMe)
@@ -119,16 +130,25 @@ namespace WhatToPlay.ViewModel
             }
         }
 
+        private void _steam_OnLoggedOff(object sender, string message)
+        {
+            LoginInProgress = false;
+            LoginSucceeded = false;
+            ErrorMessage = message;
+        }
+
         private void _steam_OnLogonFailure(object sender, string message)
         {
             LoginInProgress = false;
             LoginSucceeded = false;
+            ErrorMessage = message;
         }
 
         private void _steam_OnLogonSuccess(object sender, string message)
         {
             LoginInProgress = false;
             LoginSucceeded = true;
+            ErrorMessage = "";
         }
 
         public void Connect()
@@ -141,6 +161,7 @@ namespace WhatToPlay.ViewModel
         public void Connect(String username, SecurePassword password)
         {
             LoginInProgress = true;
+            ErrorMessage = "";
             _steam.Login(username, password, Settings.Default.SteamAPIKey);
         }
 
