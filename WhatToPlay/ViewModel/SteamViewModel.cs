@@ -19,7 +19,7 @@ namespace WhatToPlay.ViewModel
         {
             get
             {
-                return _Friends.OrderBy(f => f.PersonaState).ThenBy(f => f.PersonaName).ToList();
+                return _Friends;
             }
             set
             {
@@ -73,11 +73,11 @@ namespace WhatToPlay.ViewModel
         {
             get
             {
-                return _CommonGameList.OrderBy(g => g.Name).ToList();
+                return _CommonGameList;
             }
             set
             {
-                _CommonGameList = value;
+                _CommonGameList = value.OrderBy(g => g.Name).ToList();
                 RaisePropertyChangedEvent(nameof(CommonGameList));
             }
         }
@@ -87,11 +87,11 @@ namespace WhatToPlay.ViewModel
         {
             get
             {
-                return _CommonGameListMissingOnePlayer.OrderBy(g => g.Name).ToList();
+                return _CommonGameListMissingOnePlayer;
             }
             set
             {
-                _CommonGameListMissingOnePlayer = value;
+                _CommonGameListMissingOnePlayer = value.OrderBy(g => g.Name).ToList();
                 RaisePropertyChangedEvent(nameof(CommonGameListMissingOnePlayer));
             }
         }
@@ -134,6 +134,7 @@ namespace WhatToPlay.ViewModel
                     Friend newFriend = new Friend(m_Steam.Friends[steamId]);
                     newFriend.PropertyChanged += FriendOnPropertyChanged;
                     Friends.Add(newFriend);
+                    Friends = Friends.OrderBy(f => f.PersonaState == TinySteamWrapper.Steam.PersonaState.Offline).ThenBy(f => f.PersonaName).ToList();
                     Console.WriteLine("Adding Friend {0}", m_Steam.Friends[steamId].PersonaName);
                 }
                 else
