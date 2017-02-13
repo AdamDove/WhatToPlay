@@ -49,28 +49,27 @@
                 <Button Grid.Column="0" Content="LOGIN" Name="btnLogin" Click="Login_Click" Margin="0,8,5,0" Height="23" HorizontalContentAlignment="Left" Padding="5,0,0,0"/>
                 <Button Grid.Column="1" Content="CANCEL" Click="Cancel_Click" Margin="5,8,0,0" Height="23"  HorizontalContentAlignment="Left" Padding="5,0,0,0" />
             </Grid>
-            <!-- Authentication Entry -->
-            <Grid Grid.Row="5" Visibility="{Binding EmailAuthenticationRequired, Converter={StaticResource BoolToVisibility}}">
+            <TextBlock Grid.Row="5" Grid.Column="0" Text="Emailed Auth Code:"  TextAlignment="Right" Margin="8,8,5,8" Visibility="{Binding EmailAuthenticationRequired, Converter={StaticResource BoolToVisibility}}"  />
+            <Grid Grid.Row="5" Grid.Column="1"  Visibility="{Binding EmailAuthenticationRequired, Converter={StaticResource BoolToVisibility}}" >
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="Enter Authentication Code received in E-mail:"/>
-                <TextBox Grid.Column="1" Width="50" Text="{Binding AuthenticationCode}"/>
-                <Button Grid.Column="2" Content="Submit" Command="{Binding EmailAuthenticationEntered}"/>
+                <TextBox Grid.Column="0" Text="{Binding AuthenticationCode}" Margin="0,0,5,0" Height="23" HorizontalContentAlignment="Left" Padding="5,0,0,0"/>
+                <Button Grid.Column="1" Content="SUBMIT" Command="{Binding EmailAuthenticationEntered}" Margin="5,0,0,0" Height="23"  HorizontalContentAlignment="Left" Padding="5,0,0,0" />
             </Grid>
-            <Grid Grid.Row="5" Visibility="{Binding TwoFactorAuthenticationRequired, Converter={StaticResource BoolToVisibility}}">
+
+
+            <TextBlock Grid.Row="5" Grid.Column="0" Text="2F Auth Code:"  TextAlignment="Right" Margin="8,8,5,8" Visibility="{Binding TwoFactorAuthenticationRequired, Converter={StaticResource BoolToVisibility}}"  />
+            <Grid Grid.Row="5" Grid.Column="1"  Visibility="{Binding TwoFactorAuthenticationRequired, Converter={StaticResource BoolToVisibility}}" >
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="Enter Two Factor Authentication from your Authenticator App:"/>
-                <TextBox Grid.Column="1" Width="50" Text="{Binding AuthenticationCode}"/>
-                <Button Grid.Column="2" Content="Submit" Command="{Binding EmailAuthenticationEntered}"/>
+                <TextBox Grid.Column="0" Text="{Binding AuthenticationCode}" Margin="0,0,5,0" Height="23" HorizontalContentAlignment="Left" Padding="5,0,0,0"/>
+                <Button Grid.Column="1" Content="SUBMIT" Command="{Binding EmailAuthenticationEntered}" Margin="5,0,0,0" Height="23"  HorizontalContentAlignment="Left" Padding="5,0,0,0" />
             </Grid>
 
         </Grid>
