@@ -37,7 +37,7 @@ namespace WhatToPlay.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("58374643F2C83693030C1C9AF51ADEBF")]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string SteamAPIKey {
             get {
                 return ((string)(this["SteamAPIKey"]));
