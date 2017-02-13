@@ -1,17 +1,9 @@
 ﻿using System;
-using System.Collections.ObjectModel;
+using System.Collections.Generic;
 using System.ComponentModel;
-using System.Windows;
+using System.Linq;
 using TinySteamWrapper;
 using WhatToPlay.Model;
-using System.Linq;
-using System.Threading;
-using System.Windows.Input;
-using WhatToPlay.Common;
-using System.Collections.Generic;
-using WhatToPlay.Properties;
-using System.Security;
-using System.Reflection;
 
 namespace WhatToPlay.ViewModel
 {
@@ -26,7 +18,10 @@ namespace WhatToPlay.ViewModel
         private List<Friend> _Friends = new List<Friend>();
         public List<Friend> Friends
         {
-            get { return _Friends; }
+            get
+            {
+                return _Friends.OrderBy(f => f.PersonaState).ThenBy(f => f.PersonaName).ToList();
+            }
             set
             {
                 _Friends = value;
@@ -37,7 +32,10 @@ namespace WhatToPlay.ViewModel
         private List<SteamGameInfo> _CommonGameList = new List<SteamGameInfo>();
         public List<SteamGameInfo> CommonGameList
         {
-            get { return _CommonGameList; }
+            get
+            {
+                return _CommonGameList.OrderBy(g => g.Name).ToList();
+            }
             set
             {
                 _CommonGameList = value;
@@ -48,7 +46,10 @@ namespace WhatToPlay.ViewModel
         private List<SteamGameAndMissingPlayerInfo> _CommonGameListMissingOnePlayer = new List<SteamGameAndMissingPlayerInfo>();
         public List<SteamGameAndMissingPlayerInfo> CommonGameListMissingOnePlayer
         {
-            get { return _CommonGameListMissingOnePlayer; }
+            get
+            {
+                return _CommonGameListMissingOnePlayer.OrderBy(g => g.Name).ToList();
+            }
             set
             {
                 _CommonGameListMissingOnePlayer = value;

@@ -12,7 +12,6 @@ namespace WhatToPlay.Model
     /// </summary>
     public class GamesAndPlayers
     {
-
         // <AppID, SteamApp>
         private Dictionary<long, SteamApp> games = new Dictionary<long, SteamApp>();
         // <SteamID, SteamProfile>

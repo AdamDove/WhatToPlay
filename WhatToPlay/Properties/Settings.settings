@@ -6,7 +6,7 @@
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="SteamAPIKey" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">58374643F2C83693030C1C9AF51ADEBF</Value>
     </Setting>
     <Setting Name="SteamCallbackManagerPeriod" Type="System.TimeSpan" Scope="Application">
       <Value Profile="(Default)">00:00:01</Value>
