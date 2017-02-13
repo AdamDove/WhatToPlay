@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using TinySteamWrapper;
 using WhatToPlay.Model;
+using WhatToPlay.Properties;
 
 namespace WhatToPlay.ViewModel
 {
@@ -37,11 +38,12 @@ namespace WhatToPlay.ViewModel
                 if (_ShouldIncludeThisAccount != value)
                 {
                     _ShouldIncludeThisAccount = value;
-
+                    Settings.Default.ShouldIncludeThisAccount = value;
+                    Settings.Default.Save();
                     if (value)
-                        addThisAccountToFriendsList();
+                        ShowThisUser();
                     else
-                        removeThisAccountFromFriendsList();
+                        HideThisUser();
 
                     RaisePropertyChangedEvent(nameof(ShouldIncludeThisAccount));
                 }
@@ -57,11 +59,12 @@ namespace WhatToPlay.ViewModel
                 if (_ShouldShowOfflineUsers != value)
                 {
                     _ShouldShowOfflineUsers = value;
-
+                    Settings.Default.ShouldShowOfflineUsers = value;
+                    Settings.Default.Save();
                     if (value)
-                        addOfflineUsers();
+                        ShowOfflineUsers();
                     else
-                        removeOfflineUsers();
+                        HideOfflineUsers();
 
                     RaisePropertyChangedEvent(nameof(ShouldShowOfflineUsers));
                 }
@@ -99,6 +102,8 @@ namespace WhatToPlay.ViewModel
 
         public SteamViewModel()
         {
+            ShouldIncludeThisAccount = Settings.Default.ShouldIncludeThisAccount;
+            ShouldShowOfflineUsers = Settings.Default.ShouldShowOfflineUsers;
         }
 
         public void Initialize(Steam steam)
@@ -106,45 +111,69 @@ namespace WhatToPlay.ViewModel
             this.m_Steam = steam;
             m_Steam.OnFriendListUpdate += OnFriendListUpdateCallback;
         }
-        
-        private void removeOfflineUsers()
-        {
-
-        }
-        private void addOfflineUsers()
-        {
-
-        }
-        private void addThisAccountToFriendsList()
-        {
-
-        }
-        private void removeThisAccountFromFriendsList()
-        {
-
-        }
 
         private void OnFriendListUpdateCallback(object sender, long steamId)
         {
             lock (m_friendLock)
             {
-                if (!Friends.Any(f => f.SteamID == steamId))
-                {
-                    //Friend is new to the list
-                    Friend newFriend = new Friend(m_Steam.Friends[steamId]);
-                    newFriend.PropertyChanged += FriendOnPropertyChanged;
+
+                //Friend is new to the list
+                Friend newFriend = new Friend(m_Steam.Friends[steamId]);
+                newFriend.PropertyChanged += FriendOnPropertyChanged;
+                newFriend.IsVisible = ShouldShowFriend(newFriend);
+
+                int index = Friends.FindIndex(f => f.SteamID == steamId);
+                if (index == -1)
                     Friends.Add(newFriend);
-                    Friends = Friends.OrderBy(f => f.PersonaState == TinySteamWrapper.Steam.PersonaState.Offline).ThenBy(f => f.PersonaName).ToList();
-                    Console.WriteLine("Adding Friend {0}", m_Steam.Friends[steamId].PersonaName);
-                }
                 else
-                {
-                    //Update existing Friend
-                    int index = Friends.FindIndex(f => f.SteamID == steamId);
-                    Console.WriteLine("Updating Friend {0}", m_Steam.Friends[steamId].PersonaName);
-                    Friends[index] = new Friend(m_Steam.Friends[steamId]);
-                }
+                    Friends[index] = newFriend;
+                Friends = Friends.OrderBy(f => f.PersonaState == TinySteamWrapper.Steam.PersonaState.Offline).ThenBy(f => f.PersonaName).ToList();
                 RaisePropertyChangedEvent(nameof(Friends));
+            }
+        }
+        private bool ShouldShowFriend(Friend friend)
+        {
+            if (!ShouldIncludeThisAccount && friend.SteamID == m_Steam.OwnSteamId)
+                return false;
+            return friend.PersonaState != TinySteamWrapper.Steam.PersonaState.Offline;
+
+        }
+        private void ShowThisUser()
+        {
+            foreach (var friend in Friends)
+            {
+                if (friend.SteamID == m_Steam.OwnSteamId)
+                {
+                    friend.IsVisible = true;
+                    return;
+                }
+            }
+        }
+        private void HideThisUser()
+        {
+            foreach (var friend in Friends)
+            {
+                if (friend.SteamID == m_Steam.OwnSteamId)
+                {
+                    friend.IsVisible = false;
+                    friend.IsSelected = false;
+                    return;
+                }
+            }
+        }
+
+        private void ShowOfflineUsers()
+        {
+            foreach (var friend in Friends)
+                friend.IsVisible = true;
+        }
+        private void HideOfflineUsers()
+        {
+            foreach (var friend in Friends)
+            {
+                friend.IsVisible = ShouldShowFriend(friend);
+                if (!friend.IsVisible)
+                    friend.IsSelected = false;
             }
         }
 

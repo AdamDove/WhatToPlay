@@ -91,5 +91,29 @@ namespace WhatToPlay.Properties {
                 this["RememberMe"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ShouldIncludeThisAccount {
+            get {
+                return ((bool)(this["ShouldIncludeThisAccount"]));
+            }
+            set {
+                this["ShouldIncludeThisAccount"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ShouldShowOfflineUsers {
+            get {
+                return ((bool)(this["ShouldShowOfflineUsers"]));
+            }
+            set {
+                this["ShouldShowOfflineUsers"] = value;
+            }
+        }
     }
 }
