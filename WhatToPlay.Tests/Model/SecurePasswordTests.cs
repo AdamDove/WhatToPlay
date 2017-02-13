@@ -6,6 +6,7 @@ using System.Security;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using WhatToPlay.Model;
 using WhatToPlay.ViewModel;
 
 namespace WhatToPlay.Tests

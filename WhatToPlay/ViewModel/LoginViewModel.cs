@@ -23,6 +23,8 @@ namespace WhatToPlay.ViewModel
 
         public string AuthenticationCode { get; set; }
 
+        #region EmailAuthentication
+        ManualResetEvent waitForEmailAuthentication = new ManualResetEvent(false);
         private bool _emailAuthenticationRequired = false;
         public bool EmailAuthenticationRequired
         {
@@ -33,7 +35,14 @@ namespace WhatToPlay.ViewModel
                 RaisePropertyChangedEvent(nameof(EmailAuthenticationRequired));
             }
         }
-        
+        public ICommand EmailAuthenticationEntered
+        {
+            get { return new CommandDelegate(OnEmailAuthencationEntered, true); }
+        }
+        #endregion
+
+        #region TwoFactorAuthentication
+        ManualResetEvent waitFor2FactorAuthentication = new ManualResetEvent(false);
         private bool _twoFactorAuthenticationRequired = false;
         public bool TwoFactorAuthenticationRequired
         {
@@ -44,16 +53,13 @@ namespace WhatToPlay.ViewModel
                 RaisePropertyChangedEvent(nameof(TwoFactorAuthenticationRequired));
             }
         }
-       
-        public ICommand EmailAuthenticationEntered
-        {
-            get { return new CommandDelegate(OnEmailAuthencationEntered, true); }
-        }
         public ICommand TwoFactorAuthenticationEntered
         {
             get { return new CommandDelegate(OnTwoFactorAuthenticationEntered, true); }
         }
-        
+        #endregion
+
+        #region Login
         private bool _loginSucceeded = false;
         public bool LoginSucceeded
         {
@@ -75,6 +81,19 @@ namespace WhatToPlay.ViewModel
             }
         }
 
+        private String _errorMessage = "";
+        public String ErrorMessage
+        {
+            get { return _errorMessage; }
+            set
+            {
+                _errorMessage = value;
+                RaisePropertyChangedEvent(nameof(ErrorMessage));
+            }
+        }
+        #endregion
+
+        #region Saved Settings
         private bool _rememberMe = false;
         public bool RememberMe
         {
@@ -104,12 +123,14 @@ namespace WhatToPlay.ViewModel
                 _securePassword = value;
             }
         }
+        #endregion
 
         public LoginViewModel()
         {
             _steam = new Steam(this);
             _steam.OnLogonSuccess += _steam_OnLogonSuccess;
             _steam.OnLogonFailure += _steam_OnLogonFailure;
+            _steam.OnLoggedOff += _steam_OnLoggedOff;
 
             RememberMe = Settings.Default.RememberMe;
             if (RememberMe)
@@ -119,17 +140,32 @@ namespace WhatToPlay.ViewModel
             }
         }
 
+        #region Event Handlers
+
+        private void _steam_OnLoggedOff(object sender, string message)
+        {
+            LoginInProgress = false;
+            LoginSucceeded = false;
+            ErrorMessage = message;
+        }
+
         private void _steam_OnLogonFailure(object sender, string message)
         {
             LoginInProgress = false;
             LoginSucceeded = false;
+            ErrorMessage = message;
         }
 
         private void _steam_OnLogonSuccess(object sender, string message)
         {
             LoginInProgress = false;
             LoginSucceeded = true;
+            ErrorMessage = "";
         }
+
+        #endregion
+
+        #region UI Event Handlers
 
         public void Connect()
         {
@@ -141,40 +177,44 @@ namespace WhatToPlay.ViewModel
         public void Connect(String username, SecurePassword password)
         {
             LoginInProgress = true;
+            ErrorMessage = "";
             _steam.Login(username, password, Settings.Default.SteamAPIKey);
         }
 
         private void OnTwoFactorAuthenticationEntered()
         {
             TwoFactorAuthenticationRequired = false;
+            waitFor2FactorAuthentication.Set(); //unblock this
         }
 
         private void OnEmailAuthencationEntered()
         {
             EmailAuthenticationRequired = false;
+            waitForEmailAuthentication.Set(); //unblock this 
         }
+
+        #endregion
+
+        #region ISteamGuardPromptHandler
 
         public string GetEmailAuthenticationCode()
         {
-            Application.Current.Dispatcher.Invoke(new Action(() => { EmailAuthenticationRequired = true; }));
-
-            while (EmailAuthenticationRequired)
-            {
-                Thread.Sleep(250);
-            }
+            waitForEmailAuthentication.Reset(); // this will now block until '.Set()' is called.
+            Application.Current.Dispatcher.Invoke(new Action(() => { EmailAuthenticationRequired = true;}));
+            waitForEmailAuthentication.WaitOne();
             return AuthenticationCode;
         }
 
         public string GetTwoFactorAuthenticationCode()
         {
+            waitFor2FactorAuthentication.Reset();
             Application.Current.Dispatcher.Invoke(new Action(() => { TwoFactorAuthenticationRequired = true; }));
-
-            while (TwoFactorAuthenticationRequired)
-            {
-                Thread.Sleep(250);
-            }
+            waitFor2FactorAuthentication.WaitOne();
             return AuthenticationCode;
         }
+
+        #endregion
+
         protected void RaisePropertyChangedEvent(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

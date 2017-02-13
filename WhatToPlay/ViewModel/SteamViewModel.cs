@@ -13,7 +13,6 @@ namespace WhatToPlay.ViewModel
 
         private Steam m_Steam = null;
 
-       
         private object m_friendLock = new object();
         private List<Friend> _Friends = new List<Friend>();
         public List<Friend> Friends
@@ -26,6 +25,46 @@ namespace WhatToPlay.ViewModel
             {
                 _Friends = value;
                 RaisePropertyChangedEvent(nameof(Friends));
+            }
+        }
+
+        private bool _ShouldIncludeThisAccount;
+        public bool ShouldIncludeThisAccount
+        {
+            get { return _ShouldIncludeThisAccount; }
+            set
+            {
+                if (_ShouldIncludeThisAccount != value)
+                {
+                    _ShouldIncludeThisAccount = value;
+
+                    if (value)
+                        addThisAccountToFriendsList();
+                    else
+                        removeThisAccountFromFriendsList();
+
+                    RaisePropertyChangedEvent(nameof(ShouldIncludeThisAccount));
+                }
+            }
+        }
+
+        private bool _ShouldShowOfflineUsers;
+        public bool ShouldShowOfflineUsers
+        {
+            get { return _ShouldShowOfflineUsers; }
+            set
+            {
+                if (_ShouldShowOfflineUsers != value)
+                {
+                    _ShouldShowOfflineUsers = value;
+
+                    if (value)
+                        addOfflineUsers();
+                    else
+                        removeOfflineUsers();
+
+                    RaisePropertyChangedEvent(nameof(ShouldShowOfflineUsers));
+                }
             }
         }
 
@@ -57,6 +96,7 @@ namespace WhatToPlay.ViewModel
             }
         }
 
+
         public SteamViewModel()
         {
         }
@@ -65,6 +105,23 @@ namespace WhatToPlay.ViewModel
         {
             this.m_Steam = steam;
             m_Steam.OnFriendListUpdate += OnFriendListUpdateCallback;
+        }
+        
+        private void removeOfflineUsers()
+        {
+
+        }
+        private void addOfflineUsers()
+        {
+
+        }
+        private void addThisAccountToFriendsList()
+        {
+
+        }
+        private void removeThisAccountFromFriendsList()
+        {
+
         }
 
         private void OnFriendListUpdateCallback(object sender, long steamId)
@@ -114,11 +171,18 @@ namespace WhatToPlay.ViewModel
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
+        internal void Disconnect()
+        {
+            if (m_Steam != null)
+            {
+                m_Steam.Disconnect();
+            }
+        }
         internal void Shutdown()
         {
             if (m_Steam != null)
             {
-                m_Steam.Stop();
+                m_Steam.Shutdown();
             }
         }
 

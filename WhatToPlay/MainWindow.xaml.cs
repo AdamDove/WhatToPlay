@@ -28,19 +28,38 @@ namespace WhatToPlay
             InitializeComponent();
             ((SteamViewModel)this.SteamView.DataContext).Initialize(steam);
         }
+        private SteamViewModel ViewModel
+        {
+            get
+            {
+                return (SteamViewModel)DataContext;
+            }
+        }
+
         protected override void OnClosing(CancelEventArgs e)
         {
             base.OnClosing(e);
-            if (MessageBox.Show("Are you sure you want to Exit?", "Exit", MessageBoxButton.YesNo, MessageBoxImage.Question) ==  MessageBoxResult.Yes)
+            if (MessageBox.Show("Are you sure you want to Exit?", "Exit", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                 e.Cancel = false;
             else
                 e.Cancel = true;
         }
+
         protected override void OnClosed(EventArgs e)
         {
             (DataContext as WhatToPlay.ViewModel.SteamViewModel).Shutdown();
             App.Current.Shutdown();
-
         }
+
+        private void Disconnect_Click(object sender, RoutedEventArgs e)
+        {
+            ViewModel.Disconnect();
+        }
+
+        private void Exit_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
+        
     }
 }

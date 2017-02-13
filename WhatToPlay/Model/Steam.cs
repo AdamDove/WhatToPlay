@@ -91,7 +91,6 @@ namespace WhatToPlay.Model
             m_SteamUserName = steamUserName;
             m_SteamPassword = steamPassword;
 
-
             //Set the Steam Web API Key as we only need to do this once.
             //This doesn't check whether the key is valid though.
             SteamManager.SteamAPIKey = steamWebAPIKey;
@@ -108,7 +107,8 @@ namespace WhatToPlay.Model
         }
 
         ManualResetEvent waitForLastCallback = new ManualResetEvent(false);
-        public void Stop()
+
+        public void Disconnect()
         {
             waitForLastCallback.Reset();
             m_steamClient.Disconnect();
@@ -118,7 +118,7 @@ namespace WhatToPlay.Model
 
         public void Shutdown()
         {
-            Stop();
+            Disconnect();
             if (m_steamKitThread != null && !m_steamKitThread.Join(TimeSpan.FromSeconds(2))) // give it 2 seconds to finish gracefully.
             {
                 m_steamKitThread.Abort(); // if it hasn't finished gracefully, blow it away.
@@ -245,19 +245,27 @@ namespace WhatToPlay.Model
         {
             if (callback.Result == EResult.AccountLogonDenied)
             {
-                //Account is Steam Guarded, but doesn't need 2FA
+                //Account is Steam Guarded, but doesn't need 2FA, this is a blocking call, when it's done, we have completed this.
                 RequestEmailAuthenticationCode();
+                //now disconnect
+                Disconnect();
+                //and reconnect with the needed info.
+                Login(m_SteamUserName, m_SteamPassword, SteamManager.SteamAPIKey);
             }
             else if (callback.Result == EResult.AccountLoginDeniedNeedTwoFactor)
             {
-                //Account is Steam Guarded, and uses 2FA
+                //Account is Steam Guarded, and uses 2FA, this is a blocking call, when it's done, we have completed this.
                 RequestTwoFactorAuthenticationCode();
+                //now disconnect
+                Disconnect();
+                //and reconnect with the needed info.
+                Login(m_SteamUserName, m_SteamPassword, SteamManager.SteamAPIKey);
             }
             else if (callback.Result != EResult.OK)
             {
                 OnLogonFailure?.Invoke(this, string.Format("Unable to logon to Steam: {0} / {1}", callback.Result, callback.ExtendedResult));
 
-                Stop();
+                Disconnect();
             }
             else
             {
@@ -288,7 +296,7 @@ namespace WhatToPlay.Model
             {
                 OnConnectionFailure?.Invoke(this, string.Format("Unable to connect to Steam: {0}", callback.Result));
 
-                Stop();
+                Disconnect();
                 return;
             }
 
