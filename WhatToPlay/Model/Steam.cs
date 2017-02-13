@@ -183,10 +183,13 @@ namespace WhatToPlay.Model
 
         private void OnSteamFriendsPersonaChange(SteamFriends.PersonaStateCallback callback)
         {
-            new Task(() => { LoadFriend(callback.FriendID.ConvertToUInt64()); }).Start();
+            new Task(() =>
+            {
+                GetSteamProfile(callback.FriendID.ConvertToUInt64());
+            }).Start();
         }
-        
-        private async void LoadFriend(ulong steamId)
+
+        private async void GetSteamProfile(ulong steamId)
         {
             long id = (long)steamId;
             SteamProfile friendProfile = await SteamManager.GetSteamProfileByID(id);

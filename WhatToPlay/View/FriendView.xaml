@@ -4,14 +4,13 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:WhatToPlay.View"
-             xmlns:Converters="clr-namespace:WhatToPlay.Converters"
-        mc:Ignorable="d">
+             mc:Ignorable="d">
 
     <UserControl.Resources>
-        <Style TargetType="{x:Type CheckBox}" x:Key="CustomCheckbox" >
+        <Style TargetType="{x:Type CheckBox}" x:Key="CustomCheckbox">
             <Setter Property="Template">
                 <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type CheckBox}" >
+                    <ControlTemplate TargetType="{x:Type CheckBox}">
                         <StackPanel >
                             <Border BorderBrush="Black" BorderThickness="1.5" CornerRadius="5" Width="20" Height="20">
                                 <Ellipse Name="checkEllipse" VerticalAlignment="Center" HorizontalAlignment="Center" Width="15" Height="15" Fill="Transparent" />
@@ -26,7 +25,6 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        <Converters:BoolToVisibilityConverter x:Key="BoolToVisibility"/>
     </UserControl.Resources>
 
     <Grid>
@@ -53,7 +51,7 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <Image Grid.Column="0" Grid.RowSpan="2" Margin="0,0,5,0" Source="{Binding AvatarMedium}" Width="35" Height="35" />
+                    <Image Grid.Column="0" Grid.RowSpan="2" Margin="0,0,5,0" Source="{Binding AvatarMedium}" Width="35" Height="35"/>
                     <TextBlock Grid.Column="1" Grid.Row="0" Text="{Binding PersonaName}" FontWeight="Bold" />
                     <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding PersonaState}" />
                 </Grid>
