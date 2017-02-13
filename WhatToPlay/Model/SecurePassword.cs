@@ -7,7 +7,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WhatToPlay.ViewModel
+namespace WhatToPlay.Model
 {
     public class SecurePassword
     {

@@ -76,7 +76,7 @@
     <Compile Include="Converters\BoolToVisibilityConverter.cs" />
     <Compile Include="ViewModel\LoginViewModel.cs" />
     <Compile Include="Model\Friend.cs" />
-    <Compile Include="ViewModel\SecurePassword.cs" />
+    <Compile Include="Model\SecurePassword.cs" />
     <Compile Include="ViewModel\SteamGameAndMissingPlayerInfo.cs" />
     <Compile Include="Model\GamesAndPlayers.cs" />
     <Compile Include="ViewModel\SteamGameInfo.cs" />
