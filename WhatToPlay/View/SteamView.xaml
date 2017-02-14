@@ -38,8 +38,8 @@
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                                <local:FriendView Margin="2.5" Width="150"/>
+                        <DataTemplate >
+                            <local:FriendView Margin="2.5" Width="150"  Visibility="{Binding IsVisible, Converter={StaticResource BoolToVisibility}}"/>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>

@@ -37,7 +37,7 @@ namespace WhatToPlay.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("58374643F2C83693030C1C9AF51ADEBF")]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string SteamAPIKey {
             get {
                 return ((string)(this["SteamAPIKey"]));
@@ -89,6 +89,30 @@ namespace WhatToPlay.Properties {
             }
             set {
                 this["RememberMe"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ShouldIncludeThisAccount {
+            get {
+                return ((bool)(this["ShouldIncludeThisAccount"]));
+            }
+            set {
+                this["ShouldIncludeThisAccount"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ShouldShowOfflineUsers {
+            get {
+                return ((bool)(this["ShouldShowOfflineUsers"]));
+            }
+            set {
+                this["ShouldShowOfflineUsers"] = value;
             }
         }
     }

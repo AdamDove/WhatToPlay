@@ -83,7 +83,7 @@ namespace WhatToPlay.Model
             //Check inputs for null (notify if incorrect outside of constructor)
             if (String.IsNullOrEmpty(steamUserName))
                 throw new ArgumentNullException("steamUserName");
-            if (steamPassword== null)
+            if (steamPassword == null)
                 throw new ArgumentNullException("steamPassword");
             if (String.IsNullOrEmpty(steamWebAPIKey))
                 throw new ArgumentNullException("steamWebAPIKey");
@@ -124,6 +124,7 @@ namespace WhatToPlay.Model
                 m_steamKitThread.Abort(); // if it hasn't finished gracefully, blow it away.
             }
         }
+
         /// <summary>
         ///   Blocking call to manage SteamKit CallbackManager.  Blocks while m_isRunning is true.
         /// </summary>
@@ -131,11 +132,10 @@ namespace WhatToPlay.Model
         {
             while (m_isRunning)
             {
-                m_callbackManager.RunWaitCallbacks(Settings.Default.SteamCallbackManagerPeriod);
+                m_callbackManager.RunWaitAllCallbacks(Settings.Default.SteamCallbackManagerPeriod);
                 waitForLastCallback.Set(); //let stop() know i've run my last callbacks.
             }
         }
-
 
         private void OnSteamMachineAuth(SteamUser.UpdateMachineAuthCallback callback)
         {
@@ -191,25 +191,18 @@ namespace WhatToPlay.Model
 
         private async void GetSteamProfile(ulong steamId)
         {
-            try
-            {
-                long id = (long)steamId;
-                SteamProfile friendProfile = await SteamManager.GetSteamProfileByID(id);
+            long id = (long)steamId;
+            SteamProfile friendProfile = await SteamManager.GetSteamProfileByID(id);
 
-                if (friendProfile != null)
-                {
-                    await SteamManager.LoadGamesForProfile(friendProfile);
-                    lock (Friends)
-                    {
-                        Friends[friendProfile.SteamID] = friendProfile;
-                    }
-                    OnFriendListUpdate?.Invoke(this, friendProfile.SteamID);
-                }
-            }
-            catch (Exception generalException)
+            if (friendProfile != null)
             {
-                Console.WriteLine("Weird Exception: {0}", generalException.Message);
-                Console.WriteLine("StackTrace: {0}", generalException.StackTrace);
+                await SteamManager.LoadGamesForProfile(friendProfile);
+
+                lock (Friends)
+                {
+                    Friends[friendProfile.SteamID] = friendProfile;
+                }
+                OnFriendListUpdate?.Invoke(this, friendProfile.SteamID);
             }
         }
 
@@ -227,7 +220,7 @@ namespace WhatToPlay.Model
 
         private void OnSteamUserAccountInfo(SteamUser.AccountInfoCallback callback)
         {
-            //ChangePersonaState(EPersonaState.LookingToPlay);
+            ChangePersonaState(EPersonaState.Online);
         }
 
         private void ChangePersonaState(EPersonaState personaState)
@@ -285,9 +278,7 @@ namespace WhatToPlay.Model
 
         private void OnSteamClientDisconnected(SteamClient.DisconnectedCallback callback)
         {
-            // after recieving an AccountLogonDenied, we'll be disconnected from steam
-            // so after we read an authcode from the user, we need to reconnect to begin the logon flow again
-            OnDisconnected?.Invoke(this, "Disconnected from Steam, reconnecting in 5 seconds.");
+            OnDisconnected?.Invoke(this, "Disconnected from Steam.");
         }
 
         private void OnSteamClientConnected(SteamClient.ConnectedCallback callback)
