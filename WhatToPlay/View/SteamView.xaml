@@ -10,7 +10,7 @@
     <UserControl.Resources>
         <Converters:BoolToVisibilityConverter x:Key="BoolToVisibility"/>
     </UserControl.Resources>
-
+   
     <Grid>
         <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
@@ -34,7 +34,7 @@
                 <ItemsControl ItemsSource="{Binding Friends, IsAsync=True}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <UniformGrid Columns="1" VerticalAlignment="Top"/>
+                            <StackPanel VerticalAlignment="Top"/>
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>

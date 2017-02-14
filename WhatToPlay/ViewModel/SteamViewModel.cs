@@ -135,7 +135,9 @@ namespace WhatToPlay.ViewModel
         {
             if (!ShouldIncludeThisAccount && friend.SteamID == m_Steam.OwnSteamId)
                 return false;
-            return friend.PersonaState != TinySteamWrapper.Steam.PersonaState.Offline;
+            if (!ShouldShowOfflineUsers && friend.PersonaState == TinySteamWrapper.Steam.PersonaState.Offline)
+                return false;
+            return true;
 
         }
         private void ShowThisUser()
@@ -149,6 +151,7 @@ namespace WhatToPlay.ViewModel
                 }
             }
         }
+
         private void HideThisUser()
         {
             foreach (var friend in Friends)
@@ -167,6 +170,7 @@ namespace WhatToPlay.ViewModel
             foreach (var friend in Friends)
                 friend.IsVisible = true;
         }
+
         private void HideOfflineUsers()
         {
             foreach (var friend in Friends)
