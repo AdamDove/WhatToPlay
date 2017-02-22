@@ -171,7 +171,7 @@ namespace WhatToPlay.ViewModel
         {
             if (RememberMe)
             {
-                Connect(UserName, SecurePassword);
+                //Connect(UserName, SecurePassword);
             }
         }
         public void Connect(String username, SecurePassword password)

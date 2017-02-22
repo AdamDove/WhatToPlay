@@ -7,6 +7,7 @@ using SteamKit2;
 using TinySteamWrapper;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using WhatToPlay.Model;
 
 namespace Test
 {
@@ -46,6 +47,17 @@ namespace Test
 
             public TestApp()
             {
+                Console.Write("Game ID: ");
+                string id = Console.ReadLine();
+                GameInformation gameInformation = new GameInformation();
+                gameInformation.AppId = long.Parse(id);
+                gameInformation.RetrieveTags();
+                foreach(string tag in gameInformation.Tags)
+                {
+                    Console.WriteLine("{0}", tag);
+                }
+
+
                 Console.Write("Enter API Key: ");
                 SteamManager.SteamAPIKey = Console.ReadLine();
 
