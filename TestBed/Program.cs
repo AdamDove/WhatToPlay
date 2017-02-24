@@ -49,9 +49,8 @@ namespace Test
             {
                 Console.Write("Game ID: ");
                 string id = Console.ReadLine();
-                GameInformation gameInformation = new GameInformation();
-                gameInformation.AppId = long.Parse(id);
-                gameInformation.RetrieveTags();
+                GameInformation gameInformation = new GameInformation("", long.Parse(id));
+                gameInformation.RetrieveStoreInformation();
                 foreach(string tag in gameInformation.Tags)
                 {
                     Console.WriteLine("{0}", tag);

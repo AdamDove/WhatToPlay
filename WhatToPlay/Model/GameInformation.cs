@@ -10,31 +10,67 @@ namespace WhatToPlay.Model
 {
     public class GameInformation
     {
+        public GameInformation(string name, long id)
+        {
+            Name = name;
+            AppId = id;
+        }
+
         public string Name { get; set; }
         public long AppId { get; set; }
-        public List<string> Tags { get; set; }
-        public string StoreLink {
+        public List<string> Tags { get; private set; }
+        public string CurrentPrice { get; private set; }
+        public string Discount { get; private set; }
+
+        public string StoreLink
+        {
             get
             {
                 return string.Format("http://store.steampowered.com/app/{0}/", AppId);
             }
         }
-        
-        public void RetrieveTags()
-        {
-            if (Tags != null)
-                Tags = new List<string>();
-            else
-                Tags.Clear();
 
-            HtmlWeb web = new HtmlWeb();
-            HtmlDocument document = web.Load(StoreLink);
-            List<HtmlNode> allTags = document.DocumentNode.SelectNodes("//div[@class='game_area_details_specs']").ToList();
-            foreach(HtmlNode node in allTags)
+        public void RetrieveStoreInformation()
+        {
+            try
             {
-                string tag = node.SelectNodes("//div[@class='name']").First().InnerText;
-                Tags.Add(tag);
+                if (Tags == null)
+                    Tags = new List<string>();
+                else
+                    Tags.Clear();
+
+                HtmlWeb web = new HtmlWeb();
+                HtmlDocument storePage = web.Load(StoreLink);
+
+                //Get Tags
+                List<HtmlNode> allTags = storePage.DocumentNode.SelectNodes("//div[@class='game_area_details_specs']").ToList();
+                foreach (HtmlNode node in allTags)
+                {
+                    string tag = node.InnerText;
+                    Tags.Add(tag);
+                }
+
+                //Get Price Information
+                HtmlNode price = storePage.DocumentNode.SelectSingleNode("//div[@class='game_purchase_action_bg']");
+                HtmlNode noDiscountPrice = price.SelectSingleNode("//div[@class='game_purchase_price price']");
+                if (noDiscountPrice != null)
+                {
+                    CurrentPrice = noDiscountPrice.InnerText;
+                    Discount = String.Empty;
+                }
+                else
+                {
+                    HtmlNode discountPrice = price.SelectSingleNode("//div[@class='discount_block game_purchase_discount']");
+                    Discount = discountPrice.SelectSingleNode("//div[@class='discount_pct']").InnerText;
+                    CurrentPrice = discountPrice.SelectSingleNode("//div[@class='discount_final_price']").InnerText;
+                }
             }
+            catch (Exception generalException)
+            {
+                Console.WriteLine($"Exception retrieving store information: {generalException.Message}");
+                Console.WriteLine($"StackTrace: {generalException.StackTrace}");
+            }
+
         }
     }
 }
